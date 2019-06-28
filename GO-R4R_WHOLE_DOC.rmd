@@ -1,0 +1,2393 @@
+f# Goal Oriented Approach to R for Reproducible Research
+### OUTLINE
+Outline:
+1#Into to R & Rstudio
+	##motivation
+  ##layout
+	#arithmetic
+	#predefined functions
+	#help
+	#logicals/comparators
+	#variable/vector assignment
+	#R packages
+#Project Management with R studio
+
+2#Data Structures
+	#Intro to Gapminder
+	#loading data
+	#data types (int, num,char,log,comp)
+	#data structures: (data frame, matrix,array lists)
+
+3#Plot with ggPlot
+	#plot: lifeExpect vs gdp
+		#change theme
+	#Challenge: lifeExpect vs time
+	#line vs point
+	#layers
+	#colors
+4#subset: graph for one continent diff. color & on top
+
+5#for loop: make plot for all 5 continents
+	#multi panel plots
+6#if statement: split "Americas" to "North" & "South"
+	#Another multi-panel plot
+7#Write out data
+	#csv for data frame
+	#pdf for plots??
+	#sink() for output
+8#Functions: calculate GDP from pop and gdp/cap
+	scatter plot with range colors
+
+
+9#Day 2:
+	1. knitr
+	2. Continue with above
+
+Misc. Challenges:
+-Plot OPEC countries
+-List countries (and times with negative change in life expectancy
+
+
+
+############
+
+---
+title: "Introduction to R and RStudio"
+teaching: 45
+exercises: 10
+questions:
+- "How to find your way around RStudio?"
+- "How to interact with R?"
+- "How to manage your environment?"
+- "How to install packages?"
+objectives:
+- "Describe the purpose and use of each pane in the RStudio IDE"
+- "Locate buttons and options in the RStudio IDE"
+- "Define a variable"
+- "Assign data to a variable"
+- "Manage a workspace in an interactive R session"
+- "Use mathematical and comparison operators"
+- "Call functions"
+- "Manage packages"
+keypoints:
+- "Use RStudio to write and run R programs."
+- "R has the usual arithmetic operators and mathematical functions."
+- "Use `<-` to assign values to variables."
+- "Use `ls()` to list the variables in a program."
+- "Use `rm()` to delete objects in a program."
+- "Use `install.packages()` to install packages (libraries)."
+source: Rmd
+---
+
+
+## Motivation
+
+Science is a multi-step process: once you've designed an experiment and collected
+data, the real fun begins! This lesson will teach you how to start this process using
+R and RStudio. We will begin with raw data, perform exploratory analyses, and learn
+how to plot results graphically. This example starts with a dataset from
+[gapminder.org](https://www.gapminder.org) containing population, life expectancy and
+GDP per capita information for many countries through time. We will use this example data
+set to illustrate the power and basic functionality of the R programing language
+using R studio. R studio is an integrated development environment (IDE) that provides
+many helpful tools, some of which we will be using. R studio is not necessary, in fact
+all of what we will be doing could be done straight from the command line similar to how we
+interacted with BASH in the UNIX lesson.
+In this lesson, we will:
+* Open Rstudio and have a quick look around
+* Load the gapminder data set
+* Examine the structure and contents of the data set
+* Make a plot to look at the relationship between life expectancy and GDP per capita
+* Customize the appearance of plots
+* Save plots as .pdf files
+* Create reports to save code, comments, R output and plots.
+
+
+## Before Starting The Workshop
+
+Please ensure you have the latest version of R and RStudio installed on your machine.
+This is important, as some packages used in the workshop may not install correctly
+(or at all) if R is not up to date.
+
+[Download and install the latest version of R here](https://www.r-project.org/)
+[Download and install RStudio here](https://www.rstudio.com/)
+
+## Introduction to RStudio
+
+Welcome to the R portion of the Software Carpentry workshop.
+
+Throughout this lesson, we're going to teach you some of the fundamentals of
+the R language as well as some best practices for organizing code for
+scientific projects that will make your life easier.
+
+We'll be using RStudio: a free, open source R integrated development
+environment. It provides a built in editor, works on all platforms (including
+on servers) and provides many advantages such as integration with version
+control and project management.
+
+
+**Basic layout**
+
+When you first open RStudio, you will be greeted by three panels:
+
+  1. The interactive R console (entire left)
+  2. Environment/History (tabbed in upper right)
+  3. Files/Plots/Packages/Help/Viewer (tabbed in lower right)
+
+![RStudio layout](../figure1)
+
+Once you open files, such as R scripts (file > new file > script), an editor panel will also open
+in the top left, giving us four panels, the R console is now on the bottom left.
+
+1. The Rscript: this is basically a text file that you can type into and save on your computer.
+The scripts you write here will be available to run again in the future.
+ interactive R console (entire left)
+2. Environment/History (tabbed in upper right)
+3. The interactive R console (bottom left)
+4. Files/Plots/Packages/Help/Viewer (tabbed in lower right)
+
+![RStudio layout with .R file open](../fig/01-rstudio-script.png)
+
+
+## Work flow within RStudio
+There are two main ways you can work within RStudio.
+
+1. Test and play within the interactive R console then copy code into
+a .R file to run later.
+   *  This works well when doing small tests and initially starting off.
+   *  It quickly becomes laborious
+2. Start writing in an .R file and use RStudio's short cut keys for the Run command
+to push the current line, selected lines or modified lines to the
+interactive R console.
+   * This is a great way to start; all your code is saved for later
+   * You will be able to run the file you create from within RStudio
+   or using R's `source()`  function.
+   * The line of code that the cursor is on can be run with the shortcut: `Control` + `Enter`
+   * To run multiple lines of code, highlight the selection and press `Control` + `Enter`
+   * On OS X use `&#8984`+`Enter`
+
+> ## Tip: Running segments of your code
+>
+> RStudio offers you great flexibility in running code from within the editor
+> window. There are buttons, menu choices, and keyboard shortcuts. To run the
+> current line, you can
+> 1. click on the `Run` button above the editor panel, or
+> 2. select "Run Lines" from the "Code" menu, or
+> 3. hit <kbd>Ctrl</kbd>+<kbd>Return</kbd> in Windows or Linux
+> or <kbd>&#8984;</kbd>+<kbd>Return</kbd> on OS X.
+> (This shortcut can also be seen by hovering
+> the mouse over the button). To run a block of code, select it and then `Run`.
+> If you have modified a line of code within a block of code you have just run,
+> there is no need to reselct the section and `Run`, you can use the next button
+> along, `Re-run the previous region`. This will run the previous code block
+> including the modifications you have made.
+{: .callout}
+
+## Introduction to R
+
+Much of your time in R will be spent in the R interactive
+console. This is where you will run all of your code, and can be a
+useful environment to try out ideas before adding them to an R script
+file. This console in RStudio is the same as the one you would get if
+you typed in `R` in your command-line environment.
+
+The first thing you will see in the R interactive session is a bunch
+of information, followed by a ">" and a blinking cursor. In many ways
+this is similar to the shell environment you learned about during the
+shell lessons: it operates on the same idea of a "Read, evaluate,
+print loop": you type in commands, R tries to execute them, and then
+returns a result.
+
+## Using R as a calculator
+
+The simplest thing you could do with R is do arithmetic:
+
+```{r}
+1 + 100
+```
+
+And R will print out the answer, with a preceding "[1]". Don't worry about this.
+For now think of it as indicating output.
+
+Like bash, if you type in an incomplete command, R will wait for you to
+complete it:
+
+~~~
+> 1 +
+~~~
+{: .r}
+
+~~~
++
+~~~
+{: .output}
+
+Any time you hit return and the R session shows a "+" instead of a ">", it
+means it's waiting for you to complete the command. If you want to cancel
+a command you can simply hit "Esc" and RStudio will give you back the ">"
+prompt.
+
+> ## Tip: Cancelling commands
+>
+> If you're using R from the commandline instead of from within RStudio,
+> you need to use <kbd>Ctrl</kbd>+<kbd>C</kbd> instead of <kbd>Esc</kbd>
+> to cancel the command. This applies to Mac users as well!
+>
+> Cancelling a command isn't only useful for killing incomplete commands:
+> you can also use it to tell R to stop running code (for example if it's
+> taking much longer than you expect), or to get rid of the code you're
+> currently writing.
+>
+{: .callout}
+
+When using R as a calculator, the order of operations is the same as you might expect: from highest to lowest precedence:
+
+ - Parentheses: `(`, `)`
+ - Exponents: `^` or `**`
+ - Divide: `/`
+ - Multiply: `*`
+ - Add: `+`
+ - Subtract: `-`
+
+```{r}
+3 + 5 * 2
+```
+
+Use parentheses to group operations in order to force the order of
+evaluation if it differs from the default, or to make clear what you
+intend.
+
+```{r}
+(3 + 5) * 2
+```
+
+
+> ## Tip: Comments
+>
+> Text can be added after a line of code to "comment" on the code, without being executed. Anything that follows after the hash (or pound or octothorpe) symbol
+> `#` is ignored by R when it executes code.
+>
+{: .callout}
+
+
+
+## Mathematical functions
+
+R has many built in mathematical functions. To call a function,
+we simply type its name, followed by  open and closing parentheses.
+Anything we type inside the parentheses is called the function's
+arguments:
+
+```{r}
+sin(1)  # trigonometry functions
+```
+
+```{r}
+log(10)  # natural logarithm
+```
+
+
+Don't worry about trying to remember every function in R. You
+can look them up on online, or if you can remember the
+start of the function's name, use the tab completion in RStudio.
+
+One advantage that RStudio has over R on its own, it
+has auto-completion abilities that allow you to more easily
+look up functions, their arguments, and the values that they
+take.
+
+Typing a `?` before the name of a command will open the help page
+for that command. As well as providing a detailed description of
+the command and how it works, scrolling to the bottom of the
+help page will usually show a collection of code examples which
+illustrate command usage. We'll go through an example later.
+
+> ## Getting help
+>
+> There are many ways to get help:
+>
+> - Typing a `?` before the name of a command will open the help page
+for that command.
+> - Tab complete can be useful if you know how the command starts
+> - Internet search
+>
+{: .callout}
+
+## Comparing things (logical operators)
+
+We can also do comparison in R:
+
+```{r}
+1 == 1  # equality (note two equals signs, read as "is equal to")
+```
+
+```{r}
+1 != 2  # inequality (read as "is not equal to")
+```
+
+```{r}
+1 < 2  # less than
+```
+
+```{r}
+1 <= 1  # less than or equal to
+```
+
+```{r}
+1 > 0  # greater than
+```
+
+```{r}
+1 >= -9 # greater than or equal to
+```
+The output for each of these functions will be either TRUE or FALSE
+> ## Tip: Comparing Numbers
+>
+> A word of warning about comparing numbers: you should
+> not use `==` to compare two numbers unless they are
+> integers (a data type which can specifically represent
+> only whole numbers).
+>
+> Computers may only represent decimal numbers with a
+> certain degree of precision, so two numbers which look
+> the same when printed out by R, may actually have
+> different underlying representations and therefore be
+> different by a small margin of error (called Machine
+> numeric tolerance).
+>
+> Instead you should use the `all.equal` function.
+> ```{r}
+> all.equal(1.2, 1.2)
+> ```
+> Further reading: [http://floating-point-gui.de/](http://floating-point-gui.de/)
+>
+{: .callout}
+
+## Variables and assignment
+
+We can store values in variables using the assignment operator `<-`, like this:
+
+```{r}
+x <- 1/40
+```
+
+Notice that assignment does not print a value. Instead, we stored it for later
+in something called a **variable**. `x` now contains the **value** `0.025`:
+
+```{r}
+x
+```
+
+More precisely, the stored value is a *decimal approximation* of
+this fraction called a [floating point number](http://en.wikipedia.org/wiki/Floating_point).
+
+Look for the `Environment` tab in the upper right panel of RStudio, and you will see that `x` and its value
+have appeared. Our variable `x` can be used in place of a number in any calculation that expects a number:
+
+```{r}
+log(x)
+```
+
+Notice also that variables can be reassigned:
+
+```{r}
+x <- 100
+```
+
+`x` used to contain the value 0.025 and and now it has the value 100.
+
+Assignment values can contain the variable being assigned to:
+
+```{r}
+x <- x + 1
+y <- x * 2
+```
+
+The right hand side of the assignment can be any valid R expression.
+The right hand side is *fully evaluated* before the assignment occurs.
+
+Variable names can contain letters, numbers, underscores and periods. They
+cannot start with a number nor contain spaces at all. Different people use
+different conventions for long variable names, these include
+
+  * periods.between.words
+  * underscores\_between_words
+  * camelCaseToSeparateWords
+
+What you use is up to you, but **be consistent**.
+
+It is also possible to use the `=` operator for assignment:
+
+```{r}
+x = 1/40
+```
+
+But this is much less common among R users.  The most important thing is to
+**be consistent** with the operator you use. There are occasionally places
+where it is less confusing to use `<-` than `=`, and it is the most common
+symbol used in the community. So the recommendation is to use `<-`.
+
+> ## Challenge 1
+>
+> Which of the following are valid R variable names?
+> ```{r, eval=FALSE}
+> min_height
+> max.height
+> _age
+> .mass
+> MaxLength
+> min-length
+> 2widths
+> celsius2kelvin
+> ```
+>
+> > ## Solution to challenge 1
+> >
+> > The following can be used as R variables:
+> >
+> > ```{r ch1pt1-sol, eval=FALSE}
+> > min_height
+> > max.height
+> > MaxLength
+> > celsius2kelvin
+> > ```
+> >
+> > The following creates a hidden variable:
+
+> > ```{r eval=FALSE}
+> > .mass
+> > ```
+> >
+> > The following will not be able to be used to create a variable
+> > ```{r ch1pt3-sol, eval=FALSE}
+> > _age
+> > min-length
+> > 2widths
+> > ```
+> {: .solution}
+{: .challenge}
+
+> ## Challenge 2
+>
+> What will be the value of each  variable  after each
+> statement in the following program?
+>
+> ```{r, eval=FALSE}
+> mass <- 47.5
+> age <- 122
+> mass <- mass * 2.3
+> age <- age - 20
+> ```
+>
+> > ## Solution to challenge 2
+> >
+> > ```{r ch2pt1-sol}
+> > mass <- 47.5
+> > ```
+> > This will give a value of `r mass` for the variable mass
+> >
+> > ```{r ch2pt2-sol}
+> > age <- 122
+> > ```
+> > This will give a value of `r age` for the variable age
+> >
+> > ```{r ch2pt3-sol}
+> > mass <- mass * 2.3
+> > ```
+> > This will multiply the existing value of `r mass/2.3` by 2.3 to give a new value of
+> > `r mass` to the variable mass.
+> >
+> > ```{r ch2pt4-sol}
+> > age <- age - 20
+> > ```
+> > This will subtract 20 from the existing value of `r age + 20 ` to give a new value
+> > of `r age` to the variable age.
+> {: .solution}
+{: .challenge}
+
+> ## Challenge 3
+>
+> Run the code from the previous challenge, and write a command to
+> compare mass to age. Is mass larger than age?
+>
+> > ## Solution to challenge 3
+> >
+> > One way of answering this question in R is to use the `>` to set up the following:
+> > ```{r ch3-sol}
+> > mass > age
+> >```
+> > This should yield a boolean value of TRUE since `r mass` is greater than `r age`.
+> {: .solution}
+{: .challenge}
+
+## Vectorization
+
+One final thing to be aware of is that R is *vectorized*, meaning that
+variables and functions can have vectors as values. In R, a vector is a set of values of the same data type, that are placed in a specific order. Functions can be performed on every value in the vector.
+
+```{r}
+1:5 # colon notation indicates successive numbers
+2^(1:5) # operations can be performed on every value in the vector
+x <- 1:5
+2^x
+c(1,3,5,7) #vectors can be defined specifically using c()
+```
+
+In R a function can be called on every component of a list without a 'for loop'
+
+
+## Managing your environment
+
+There are a few useful commands you can use to interact with the R session.
+
+`ls` will list all of the variables and functions stored in the global environment
+(your working R session):
+
+```{r}
+ls()
+```
+
+Note here that we didn't give any arguments to `ls`, but we still
+needed to give the parentheses to tell R to call the function.
+
+
+You can use `rm` to delete objects you no longer need:
+
+```{r}
+rm(x)
+```
+
+## R Packages
+
+It is possible to add functions to R by writing a package, or by
+obtaining a package written by someone else. As of this writing, there
+are over 10,000 packages available on CRAN (the comprehensive R archive
+network). R and RStudio have functionality for managing packages:
+
+* You can see what packages are installed by typing
+  `installed.packages()`
+* You can install packages by typing `install.packages("packagename")`,
+  where `packagename` is the package name, in quotes.
+* You can update installed packages by typing `update.packages()`
+* You can remove a package with `remove.packages("packagename")`
+* You can make a package available for use with `library(packagename)`
+
+
+
+> ## Challenge 5
+>
+> Install the following packages: `ggplot2`, `plyr`, `gridExtra`
+>
+> > ## Solution to challenge 5
+> >
+> > We can use the `install.packages()` command to install the required packages.
+> > ```{r ch5-sol, eval=FALSE}
+> > install.packages("ggplot2")
+> > library("ggplot2")
+> > install.packages("plyr")
+> > library("plyr")
+> > install.packages("gridExtra")
+> > library("gridExtra")
+> >```
+> {: .solution}
+{: .challenge}
+
+
+
+---
+title: "Project Management With RStudio"
+teaching: 20
+exercises: 10
+questions:
+- "How can we use R studio to help stay organized?"
+objectives:
+- Create a self-contained project in R Studio for analyzing the data in the SWC session
+keypoints:
+- "Use RStudio to create and manage projects with consistent layout."
+- "Treat raw data as read-only."
+- "Treat generated output as disposable."
+source: Rmd
+---
+
+```{r, eval=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("02-")```
+```
+
+## Introduction
+
+The scientific process is naturally incremental, and many projects
+start life as random notes, some code, then a manuscript, and
+eventually everything is a bit mixed together.
+
+<blockquote class="twitter-tweet"><p>Managing your projects in a reproducible fashion doesn't just make your science reproducible, it makes your life easier.</p>— Vince Buffalo (@vsbuffalo) <a href="https://twitter.com/vsbuffalo/status/323638476153167872">April 15, 2013</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+Most people tend to organize their projects like this:
+
+![](../fig/bad_layout.png)
+
+There are many reasons why we should *ALWAYS* avoid this:
+
+1. It is really hard to tell which version of your data is
+the original and which is the modified;
+2. It gets really messy because it mixes files with various
+extensions together;
+3. It probably takes you a lot of time to actually find
+things, and relate the correct figures to the exact code
+that has been used to generate it;
+
+A good project layout will ultimately make your life easier:
+
+* It will help ensure the integrity of your data;
+* It makes it simpler to share your code with someone else
+(a lab-mate, collaborator, or supervisor);
+* It allows you to easily upload your code with your manuscript submission;
+* It makes it easier to pick the project back up after a break.
+
+## A possible solution
+
+Fortunately, there are tools and packages which can help you manage your work effectively.
+
+One of the most powerful and useful aspects of RStudio is its project management
+functionality. We'll be using this today to create a self-contained, reproducible
+project.
+
+> ## Tip: R studio (and other programs) can not replace diligent organization!
+>
+> There are numerous programs (including R Studio) that can help to organize and manage projects. However there is no replacement for good data habits. Some good practices include:
+> - Consistent directory organization
+> - Consistent and descriptive file names
+> - Version  Control
+>
+> In both cases, the message that R prints out usually give you clues
+> how to fix a problem.
+>
+{: .callout}
+
+> ## Challenge: Creating a self-contained project
+>
+> We're going to create a new project in RStudio:
+>
+> 1. Click the "File" menu button, then "New Project".
+> 2. Click "New Directory".
+> 3. Click "Empty Project".
+> 4. Type in the name of the directory to store your project, e.g. "SWC-2018-May_GapminderAnalysis"
+> 5. Click the "Create Project" button.
+{: .challenge}
+
+Now when we start R in this project directory, or open this project with RStudio,
+all of our work on this project will be entirely self-contained in this directory.
+
+## Best practices for project organization
+
+Although there is no "best" way to lay out a project, there are some general
+principles to adhere to that will make project management easier:
+
+### Treat data as read only
+
+This is probably the most important goal of setting up a project. Data is
+typically time consuming and/or expensive to collect. Working with them
+interactively (e.g., in Excel) where they can be modified means you are never
+sure of where the data came from, or how it has been modified since collection.
+It is therefore a good idea to treat your data as "read-only".
+
+### Data Cleaning
+
+In many cases your data will be "dirty": it will need significant preprocessing
+to get into a format R (or any other programming language) will find useful. This
+task is sometimes called "data munging". I find it useful to store these scripts
+in a separate folder, and create a second "read-only" data folder to hold the
+"cleaned" data sets.
+
+### Treat generated output as disposable
+
+Anything generated by your scripts should be treated as disposable: it should
+all be able to be regenerated from your scripts.
+
+There are lots of different ways to manage this output. I find it useful to
+have an output folder with different sub-directories for each separate
+analysis. This makes it easier later, as many of my analyses are exploratory
+and don't end up being used in the final project, and some of the analyses
+get shared between projects.
+
+> ## Tip: Good Enough Practices for Scientific Computing
+>
+> [Good Enough Practices for Scientific Computing](https://github.com/swcarpentry/good-enough-practices-in-scientific-computing/blob/gh-pages/good-enough-practices-for-scientific-computing.pdf) gives the following recommendations for project organization:
+>
+> 1. Put each project in its own directory, which is named after the project.
+> 2. Put text documents associated with the project in the `doc` directory.
+> 3. Put raw data and metadata in the `data` directory, and files generated during cleanup and analysis in a `results` directory.
+> 4. Put source for the project's scripts and programs in the `src` directory, and programs brought in from elsewhere or compiled locally in the `bin` directory.
+> 5. Name all files to reflect their content or function.
+>
+{: .callout}
+
+
+
+> ## Tip: Avoiding Duplication
+> You may find yourself using data or analysis scripts across several projects. Reusable chunks of code can be get pulled into their own functions. These functions that you'll reuse across analyses and projects should be stored separately.  Typically you want to avoid duplication to save space and avoid having to make updates to code in multiple places.
+> In this case I find it useful to make "symbolic links", which are essentially
+> shortcuts to files somewhere else on a filesystem. On Linux and OS X you can
+> use the `ln -s` command, and on Windows you can either create a shortcut or
+> use the `mklink` command from the windows terminal.
+{: .callout}
+
+
+---
+title: "Data Structures"
+teaching: 40
+exercises: 15
+questions:
+- "How can I read data in R?"
+- "What are the basic data types in R?"
+- "How do I represent categorical information in R?"
+objectives:
+- "To be aware of the different types of data."
+- "To begin exploring data frames, and understand how they are related to vectors, factors and lists."
+- "To be able to ask questions from R about the type, class, and structure of an object."
+keypoints:
+- "Use `read.csv` to read tabular data in R."
+- "The basic data types in R are double, integer, complex, logical, and character."
+- "Use factors to represent categories in R."
+source: Rmd
+---
+
+```{r, eval=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("04-")
+```
+# Introduction to the Gapminder Data Set
+
+For this Software Carpentry Workshop we will be working with the Gapminder data set. This data  set contains population size, life expectancy and GDP per capita for many countries over time. This data set will allow us to explore data handling and manipulation techniques in R.
+
+### Save the data in the data directory
+
+Now we have a good directory structure we will now place/save the data file in the `data/` directory.
+
+
+Download the gapminder data from [here](https://raw.githubusercontent.com/resbaz/r-novice-gapminder-files/master/data/gapminder-FiveYearData.csv).
+
+1. Download the file (CTRL + S, right mouse click -> "Save as", or File -> "Save page as")
+2. Make sure it's saved under the name `gapminder-FiveYearData.csv`
+3. Save the file in the `data/` folder within your project.
+
+
+
+It is useful to get some general idea about the dataset, directly from the
+command line (i.e. UNIX shell), before loading it into R. Understanding the dataset better
+will come in handy when making decisions on how to load it in R. Use the command-line
+shell to answer the following questions:
+1. What is the size of the file?
+```
+ls -lh data/gapminder-FiveYearData.csv
+```
+2. How many rows of data does it contain?
+```
+wc -l data/gapminder-FiveYearData.csv
+```
+3. What kinds of values are stored in this file?
+```
+ head data/gapminder-FiveYearData.csv
+```
+
+
+ ## Load the data into R studio
+ One of R's most powerful features is its ability to deal with tabular data -
+ such as you may already have in a spreadsheet or a CSV file. The `read.table` function is used for reading in tabular data stored in a text file where the columns of data are separated by punctuation characters such as CSV files (csv = comma-separated values). Tabs and commas are the most common punctuation characters used to separate or delimit data points in csv files.
+ For convenience R provides 2 other versions of `read.table`. These are: `read.csv`
+ for files where the data are separated with commas and `read.delim` for files
+ where the data are separated with tabs. Let's start by loading the gapminder data set:
+
+ ```{r}
+ gapminder <- read.csv(file = "gapminder.csv")
+ head(gapminder)
+ ```
+ Here the first 166 lines are shown, and 1538 additional lines are not shown. To view the entire dataset in tabular form use View().
+ ```
+ View(gapminder) #note uppercase 'V'
+ ```
+The tabular view makes it a little easier to see that this data set is organized in "wide" format, meaning that each row contains a data point, and each column contains various information pertaining to that sample.
+## Introduction to Data Types and Structures
+ We can begin exploring our dataset right away, lets look first at the structure of our data set:
+```{r}
+str(gapminder)
+```
+This output gives us a lot of useful information:
+First, the "gapminder" data set is a Data Frame, which is on of the data structures that R can handle.
+Next, there appear to be 1704 rows (observations) and 6 columns (each containing a variable)
+Each variable is then listed after the `$` sign, following the variable name we get some information about each column.
+ - Data type
+ - Some idea of what the values are
+
+In R there are 5 main data types:
+
+ - integer: contains integers (i.e. whole numbers as you would expect)
+ - numeric: floating point numbers (also called 'double')
+ - complex: numeric including imaginary numbers (i)
+ - logical: `TRUE` or `FALSE`
+ - character: letter(s), numbers(s), word(s)
+To determine which data type a value or vector is, use class()
+```{r}
+x<-(2)
+class(x)
+```
+
+ > ## Tip: Data Types
+ >
+ > The definition of data types listed above seem straight forward, but confusion (and error messages) can arise when unintended data types are assigned.
+ > the value `2` could be stored as an integer, numeric, complex, or a character.
+ > To convert a value to an integer:
+ > ```
+ > as.integer(value)
+ > ```
+ > To convert a value to numeric:
+ > ```
+ > as.numeric(value)
+ > ```
+ > To convert a value to a character:
+ > ```
+ > as.character(value)
+ > ```
+ > There is an order of 'strictness' by definition: any entry can be a 'character' but only specific values can be integers.
+ > ```{r}
+ > as.integer("test")
+ > ```
+ >
+ {: .callout}
+
+## Vectors
+
+Vectors in R can take on any *one* of the above data types (one variable-- one data type). A data frame (like gapminder) is a collection of variables (in a certain order), each variable can hold a different data type.
+
+## Other Data Structures
+
+The simplest data structure in R is a **list**, which is essentially a vector, or collection of values in a specific order. Every value in a list must be of the same type (i.e. all integers, or all characters, not a combination)
+
+A **Data Frame** is a collection of lists, these lists are in a certain order and are useful for storing tabular data. Think of each list as a column in a spreadsheet, because each one is ordered, each row can contain different information about each data point. Although each column/list must contain a single data type, differnet columns can contain different data types (e.g. Column 1: integers, Column 2: characters, Column 3: logical...).
+
+Data in R can also be stored as a **matrix**, which is similar to a data frame, except that all variables must be of the same data type (i.e. every value is an integer, or numeric or which ever), and not a combination of data types. Additionally R can define an **array** which is similar to a matrix in that all values must be of the same type, but allows higher dimensions (matrices are limited to 2 dimensions).
+
+Additionally, data types can be **factored**, which groups the values within a variable into a finite number of *factors*. For example, think about a variable full of integers, this could contain data such as test scores (i.e. values range 0-100) or group the observations (i.e.students) in to belonging to 'classroom 1' or 'classroom 2.'
+
+> ## Tip: Factors
+>
+> A variety of unexpected things (though mostly error messages and goofy plots) can occur when variables are not treated as factors when they should be (or vice versa).
+> To convert a variable to a factor:
+> ```
+> as.factor(variable-name)
+> ```
+> To convert a factored variable to character:
+> ```
+> as.character(factored-variable-name)
+> ```
+> ```
+> as.numeric(factored-variable-name)
+> ```
+{: .callout}
+
+## Data set descriptions
+
+So if we look here at the output from `str(gapminder)`` it looks like 5 continents are represented. Which continents are listed here? To pull the values from one column (i.e. the continent column) we will use <kbd>$</kbd> operator
+```
+gapminder$continent
+```
+```{r}
+tail(gapminder$continent)
+```
+This displays many of the entries, then gets cut-off. We can see that each of these values get repeated numerous times in the data set so they appear in this printout several times. To view the unique instances for this factored variable use  `unique()`
+
+```{r}
+unique(gapminder$continent)
+```
+Another very useful function for examining data sets is `length()`
+
+```{r}
+length(gapminder$continent)
+```
+
+
+---
+title: Creating Publication-Quality Graphics with ggplot2
+teaching: 60
+exercises: 20
+questions:
+- "How can I create publication-quality graphics in R?"
+objectives:
+- "To be able to use ggplot2 to generate publication quality graphics."
+- "To apply geometry, aesthetic, and statistics layers to a ggplot plot."
+- "To manipulate the aesthetics of a plot using different colors, shapes, and lines."
+- "To improve data visualization through transforming scales and paneling by group."
+key points:
+- "Use `ggplot2` to create plots."
+- "Think about graphics in layers: aesthetics, geometry, statistics, scale transformation, and grouping."
+source: Rmd
+---
+
+```
+{r, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("08-")
+gapminder <- read.csv("data/gapminder-FiveYearData.csv", header = TRUE)
+```
+
+Plotting our data is one of the best ways to
+quickly explore it and the various relationships
+between variables.
+
+There are three main plotting systems in R:
+ - [base]: http://www.statmethods.net/graphs/
+ - [lattice]: http://www.statmethods.net/advgraphs/trellis.html
+ - [ggplot2]: http://www.statmethods.net/advgraphs/ggplot2.html
+
+Today we'll be learning about the ggplot2 package, because
+it is the most effective and powerful method of creating publication quality
+graphics.
+
+ggplot2 is built on the grammar of graphics, the idea that any plot can be
+expressed from the same set of components: a **data** set, a
+**coordinate system**, and a set of **geoms**--the visual representation of data
+points.
+
+The key to understanding ggplot2 is thinking about a figure in layers.
+This idea may be familiar to you if you have used image editing programs like Photoshop, Illustrator, or
+Inkscape.
+
+Let's start off with an example, let's look at the relationship between gdp per capita and life expectancy:
+
+```
+{r lifeExp-vs-gdpPercap-scatter, message=FALSE}
+library("ggplot2")
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+So the first thing we do is call the `ggplot` function. This function lets R
+know that we're creating a new plot, and any of the arguments we give the
+`ggplot` function are the *global* options for the plot: they apply to all
+layers on the plot.
+
+We've passed in two arguments to `ggplot`. First, we tell `ggplot` what data we
+want to show on our figure, in this example the gapminder data we read in
+earlier. For the second argument we passed in the `aes` function, which
+tells `ggplot` how variables in the **data** map to *aesthetic* properties of
+the figure, in this case the **x** and **y** locations. Here we told `ggplot` we
+want to plot the "gdpPercap" column of the gapminder data frame on the x-axis, and
+the "lifeExp" column on the y-axis. Notice that we didn't need to explicitly
+pass `aes` these columns (e.g. `x = gapminder[, "gdpPercap"]`), this is because
+`ggplot` is smart enough to know to look in the **data** for that column!
+
+By itself, the call to `ggplot` isn't enough to draw a figure:
+
+```
+{r}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp))
+```
+
+We need to tell `ggplot` how we want to visually represent the data, which we
+do by adding a new **geom** layer. In our example, we used `geom_point`, which
+tells `ggplot` we want to visually represent the relationship between **x** and
+**y** as a scatterplot of points:
+
+```
+{r lifeExp-vs-gdpPercap-scatter2}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+Great, now we have our first plot! Lets start with one modification to change the theme of the plot, to make it a little more publishable in standard scientific journals!
+
+```
+{r lifeExp-vs-gdpPercap-scatter2}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + theme_classic()
+```
+Our plot is displayed in R Studio for now, but we need to save it so that we can keep it when we make our next plot. Replace fileName.pdf with an appropriate (useful and consistent) name.
+
+```
+ggsave("LifeExpectancy_by_GDPperCap.pdf")
+```
+
+ # Challenge 1
+>
+> Modify the example so that the figure shows how life expectancy has
+> changed over time (and save the file):
+>
+>```
+> ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point()
+> ```
+>
+> Hint: the gapminder dataset has a column called "year", which should appear
+> on the x-axis.
+>
+> > ## Solution to challenge 1
+> >
+> > Here is one possible solution:
+> >
+> > ```{r ch1-sol}
+> > ggplot(data = gapminder, aes(x = year, y = lifeExp)) + geom_point()
+> > ggsave("GDPbyYear.pdf")
+> > ```
+> >
+> {: .solution}
+{: .challenge}
+
+
+
+Using a scatterplot probably isn't the best for visualizing change over time.
+Instead, let's tell `ggplot` to visualize the data as a line plot:
+
+```
+{r lifeExp-line}
+ggplot(data = gapminder, aes(x=year, y=lifeExp, by=country)) +
+  geom_line()
+```
+
+Instead of adding a `geom_point` layer, we've added a `geom_line` layer. We've
+added the **by** *aesthetic*, which tells `ggplot` to draw a line for each
+country.
+
+But what if we want to visualize both lines and points on the plot? We can
+simply add another layer to the plot:
+
+```
+{r lifeExp-line-point}
+ggplot(data = gapminder, aes(x=year, y=lifeExp, by=country, color=continent)) +
+  geom_line() + geom_point()
+```
+
+It's important to note that each layer is drawn on top of the previous layer. To demonstrate, lets add some color, in this example the points are drawn *on top of* the lines.
+
+```
+{r lifeExp-layer-example-1}
+ggplot(data = gapminder, aes(x=year, y=lifeExp, by=country)) +
+  geom_line(aes(color=continent)) + geom_point()
+```
+
+In contrast, in this example, the lines are drawn on top of the points.
+
+```
+{r lifeExp-layer-example-1}
+ggplot(data = gapminder, aes(x=year, y=lifeExp, by=country)) + geom_point() +
+  geom_line(aes(color=continent))
+```
+
+> ## Tip: Setting an aesthetic to a value instead of a mapping
+>
+> So far, we've seen how to use an aesthetic (such as **color**) as a *mapping* to a variable in the data. For example, when we use `geom_line(aes(color=continent))`, ggplot will give a  different color to each continent.
+> - What if we want to change the color of all lines to blue? You may think that `geom_line(aes(color="blue"))` should work, but it doesn't. Since we don't want to create !a mapping to a >specific variable, we simply move the color specification outside of the `aes()` function, like this: `geom_line(color="blue")`. Generally, if it is a *constant* (i.e. it does not change with data) place it outside of the `aes()` function.
+>`ggplot(data = gapminder, aes(x=year, y=lifeExp, by=country)) + geom_line(color="blue")`
+>
+{: .callout}
+
+##More About Selecting Plot Colors
+In the last plot, the color palette were selected by R, this is often a helpful place to start, but rarely what we actually want! We can specify colors using the `scale_colour_manual()` function. Inside the parentheses specify the colors you want. Colors can be specified by their name (e.g. "black", "red", "green" etc.) or with hexadecimal codes. There are several possibilities for selecting colors!
+ - All colors the same: use `color="DesiredColor"` (outside of `aes()``)
+ `ggplot(data = gapminder) +geom_line(aes(x=year, y=lifeExp, by=country), color='darkOliveGreen')`
+
+ - Data points colored differently relative to group assignment (R standard): inside of `aes()` use `color="ColumnName"`
+ `ggplot(data = gapminder) +geom_line(aes(x=year, y=lifeExp, by=country, color=continent))`
+
+ - Data points colored differently relative to group assignment (Manually selected): use `+ scale_colour_manual(values="SelectedColors")` Note: you must provide the same number of colors as number of groups to color
+ `ggplot(data = gapminder) +geom_line(aes(x=year, y=lifeExp,by=country, color=continent)) +scale_colour_manual(values=c('red','green','pink','yellow', 'black'))`
+
+Now, what if we want to highlight values from one Continent, lets say Oceania, by making them black (other points red), and prominently displayed? The last example showed a technique for making one group a different color than the rest, but some points are hidden beneath other data points. To correct this we need to plot the values from Oceania on top of the other points, and we can do this because arguments in ggplot are layered. However we need to learn about **subsetting** data first.
+
+### Subsetting Data
+Often we are interested in working with only a part of our data set. R has a few different techniques for subseting data, we will look at a few of these methods here.
+1. Use brackets (`[]`) to select rows and columns based on row and column number: The first value is the row number, and the second is the column number
+```
+{r}
+gapminder[1,1]
+```
+Note,the values for row and column numbers can be vectors
+```
+{r}
+gapminder[1:5,c(1,3,5)]
+```
+If either value is not specified, all rows/columns will be returned
+```
+{r}
+gapminder[1,]
+```
+2. The names of rows and columns can be specifically called for subsetting as well
+```
+{r}
+ gapminder[gapminder$country=="Australia" & gapminder$year==1952, c("year","lifeExp")]
+```
+3. Subsetting can also be achieved with the `subset()` function, which takes 3 arguments: data frame, row selection and column selection
+
+subset(gapminder, country=="Australia" & year==1952, select = c(year,lifeExp))
+
+4. Functions in 'dplyr' library These are beyond the scope of this workshop, but may be useful.
+
+
+
+> ## Challenge 2
+>
+> Use your new 'subsetting' skills to display the life expectancy and GDPperCapita for people in Paraguay in 2007
+>
+> ```
+{r, eval=FALSE}
+> ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point()
+> ```
+>
+>
+> > ## Solution to challenge 2
+> >
+> > Here are two possible solutions:
+> >
+> > ```
+{r}
+> > gapminder[gapminder$country=='Paraguay' & gapminder$year==2007, c('lifeExp','gdpPercap')]
+> > ```
+> >
+> > ```{r}
+> > subset(gapminder, country=='Paraguay' & year==2007, select = c (lifeExp,gdpPercap))
+> > ```
+> >
+> {: .solution}
+{: .challenge}
+
+### Plotting a subset of data
+To highlight the values from Ocenaia on a plot, we need to plot these on top of the other data points. To do this we will plot all of the points in red, and then plot the points from Oceana in black on top of the other points.
+
+```
+{r}
+ggplot(data = gapminder) + geom_line(aes(x=year, y=lifeExp, by=country), color="red") + geom_line(data = subset(gapminder, continent=="Oceania"), aes(x=year, y=lifeExp, by=country), color="black")
+```
+Key points:
+  - Plots are layered
+  - Individual subsets of data can be plotted
+  - When all data points are to be the same color, the color argument goes outside of the `aes()` function.
+
+## Plot appearance
+Let's take a little time and clean-up the appearance of this plot
+
+First, lets change the theme to standard black and white.
+Add `+ theme_classic()``
+
+Now, lets change the titles of the axes to "Year" and "Life Expectancy"
+Add `+ labs(title= "Oceania on the Rise", x="Year", y="Life Expectancy")`
+
+Let's also change the scale on the Y-axis to 0 - 100: this looks more complicated than it is, but the function for altering the y axis takes several arguments:
+  - limits: how far the axis extends
+  - breaks: where the tick marks are
+  - labels: where the labels for the ticks go
+  Note, to specify exactly where the ticks and labels go, use `seq(0,100,10)` to generate a sequence of numbers from 0 to 100, each 10 apart.
+
+`+ scale_y_continuous(limits= c(0,100), breaks = seq(0,100,10), labels= seq(0,100,10))`
+
+Let's also clean up the X-axis, moving the ticks over to the sampling years
+
+`+ scale_x_continuous(breaks = seq(1952,2007,5), labels=seq(1952,2007,5))`
+
+
+#Multi Panel Plots
+Sometimes, it is necessary to create a figure with several individual panels, to demonstrate, lets plot life expectancy per year for each continent individually.
+We learned in the previous section how to subset the data, so we could pull the necessary data for each continent and make a plot for each, and with only 5 continents, that's not a terrible project, but let's use a For-loop for automation instead!
+
+
+# Repeating operations (loops)
+
+If you want to iterate over
+a set of values, when the order of iteration is important, and perform the
+same operation on each, a `for()` loop will do the job.
+We saw `for()` loops in the shell lessons earlier. This is the most
+flexible of looping operations, but therefore also the hardest to use
+correctly. Avoid using `for()` loops unless the order of iteration is important:
+i.e. the calculation at each iteration depends on the results of previous iterations.
+
+The basic structure of a `for()` loop is:
+
+```
+{r, eval=FALSE}
+for(iterator in set of values){
+  do a thing
+}
+```
+
+For example:
+
+```
+{r}
+for(i in 1:10){
+  print(i)
+}
+```
+
+The `1:10` bit creates a vector on the fly; you can iterate
+over any other vector as well.
+
+We can use a `for()` loop nested within another `for()` loop to iterate over two things at
+once.
+
+```
+{r}
+for(i in 1:5){
+  for(j in c('a', 'b', 'c', 'd', 'e')){
+    print(paste(i,j))
+  }
+}
+```
+Note `paste()` allows concatenation of characters, allows you to 'paste' together characters. This is often useful for constructing sentences or messages that have some fixed text with a variable (output of some code) inserted inside. For example you may print a message to say "the last loop printed 25 lines" where 25 is the output from some function and the other words are supplied manually
+
+
+Rather than printing the results, we could write the loop output to a new object.
+
+```
+{r}
+output_vector <- c()
+for(i in 1:5){
+  for(j in c('a', 'b', 'c', 'd', 'e')){
+    temp_output <- paste(i, j)
+    output_vector <- c(output_vector, temp_output)
+  }
+}
+output_vector
+```
+
+This approach can be useful, but 'growing your results' (building
+the result object incrementally) is computationally inefficient, so avoid
+it when you are iterating through a lot of values.
+
+> ## Tip: don't grow your results
+>
+> One of the biggest things that trips up novices and
+> experienced R users alike, is building a results object
+> (vector, list, matrix, data frame) as your for loop progresses.
+> Computers are very bad at handling this, so your calculations
+> can very quickly slow to a crawl. It's much better to define
+> an empty results object before hand of the appropriate dimensions.
+> So if you know the end result will be stored in a matrix like above,
+> create an empty matrix with 5 row and 5 columns, then at each iteration
+> store the results in the appropriate location.
+{: .callout}
+
+A better way is to define your (empty) output object before filling in the values.
+For this example, it looks more involved, but is still more efficient.
+
+```
+{r}
+output_matrix <- matrix(nrow=5, ncol=5)
+j_vector <- c('a', 'b', 'c', 'd', 'e')
+for(i in 1:5){
+  for(j in 1:5){
+    temp_j_value <- j_vector[j]
+    temp_output <- paste(i, temp_j_value)
+    output_matrix[i, j] <- temp_output
+  }
+}
+output_vector2 <- as.vector(output_matrix)
+output_vector2
+```
+
+> ## Tip: While loops
+>
+>
+> Sometimes you will find yourself needing to repeat an operation until a certain
+> condition is met. You can do this with a `while()` loop.
+>
+> ```
+{r, eval=FALSE}
+> while(this condition is true){
+>   do a thing
+> }
+> ```
+>
+> As an example, here's a while loop
+> that generates random numbers from a uniform distribution (the `runif()` function)
+> between 0 and 1 until it gets one that's less than 0.1.
+>
+> ~~~
+> z <- 1
+> while(z > 0.1){
+>   z <- runif(1)
+>   print(z)
+> }
+> ~~~
+> {: .r}
+>
+> `while()` loops will not always be appropriate. You have to be particularly careful
+> that you don't end up in an infinite loop because your condition is never met.
+{: .callout}
+
+So lets use a for loop to create a few plots
+
+```
+{r}
+
+plotC<-list()
+for (i in unique(gapminder$continent)) {
+  data1 <-subset(gapminder, continent==i)
+  plotC[[i]]<- ggplot(data = data1) + geom_line(aes_string(x='year', y='lifeExp', by='country'), color="red")
+  plotC[[i]]<- plotC[[i]] + labs(title= i, x="Year", y="Life Expectancy") + theme_classic()
+  plotC[[i]]<- plotC[[i]] + scale_y_continuous(limits= c(0,100), breaks = seq(0,100,10), labels= seq(0,100,10))
+  plotC[[i]]<- plotC[[i]] + scale_x_continuous(breaks = seq(1952,2007,10), labels=seq(1952,2007,10))
+}
+```
+Nothing came up on the screen, but the plots exist, they are stored in the list called "plotC"
+we can print the first one in the list with:
+```
+{r}
+print(plotC)[1]
+```
+
+The "gridExtra" library has a useful tool for creating plots with multiple panels.
+To install and use this library use
+```
+install.packages("gridExtra")
+library("gridExtra")
+```
+To arrange the panels use:
+```{r}
+grid.arrange(grobs=plotC, nrow=3)
+```
+Here, `plotC` is the list we made in the loop that has all of the plots in it and `nrow=3` directs plots to printed into 3 rows
+
+A strange consequence of grid.arrange is that it displays the multi panel plot in the viewer, but `ggsave()` will only capture the last plot (Oceania). To save this image we need another statement:
+```
+plotC_grob<- arrangeGrob(grobs=plotC, nrow=3, top= "Life Expectancy per Continent over Time")
+ggsave("filename.png", plotC_grob)
+```
+
+
+So, we accomplished our goal of creating a plot for each Continent, we have 5 plots, but we have room for a 6th, lets split the `Americas` into  `NorthAmerica` and `SouthAmerica` which will fill our page a little better.
+To do this, we need to learn about **conditional statements** which will let us 'decide' whether to perform a function based on the data.
+
+
+# Data-dependent choices
+
+```
+{r, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("07-")
+gapminder <- read.csv("data/gapminder-FiveYearData.csv", header=TRUE)
+
+```
+
+Often when we're coding we want to control the flow of our actions. This can be done
+by setting actions to occur only if a condition or a set of conditions are met.
+Alternatively, we can also set an action to occur a particular number of times.
+
+There are several ways you can control flow in R.
+For conditional statements, the most commonly used approaches are the constructs:
+
+```
+{r, eval=FALSE}
+# if
+if (condition is true) {
+  perform action
+}
+
+# if ... else
+if (condition is true) {
+  perform action
+} else {  # that is, if the condition is false,
+  perform alternative action
+}
+```
+
+Say, for example, that we want R to print a message if a variable `x` has a particular value:
+
+```{r}
+x <- 8
+
+if (x >= 10) {
+  print("x is greater than or equal to 10")
+}
+
+x
+```
+
+The print statement does not appear in the console because x is not greater than 10. To print a different message for numbers less than 10, we can add an `else` statement.
+
+```{r}
+x <- 8
+
+if (x >= 10) {
+  print("x is greater than or equal to 10")
+} else {
+  print("x is less than 10")
+}
+```
+
+You can also test multiple conditions by using `else if`.
+
+```{r}
+x <- 8
+
+if (x >= 10) {
+  print("x is greater than or equal to 10")
+} else if (x > 5) {
+  print("x is greater than 5, but less than 10")
+} else {
+  print("x is less than 5")
+}
+```
+
+**Important:** when R evaluates the condition inside `if()` statements, it is
+looking for a logical element, i.e., `TRUE` or `FALSE`. This can cause some
+headaches for beginners. For example:
+
+```{r}
+x  <-  4 == 3
+if (x) {
+  "4 equals 3"
+} else {
+  "4 does not equal 3"
+}
+```
+
+As we can see, the not equal message was printed because the vector x is `FALSE`
+
+```{r}
+x <- 4 == 3
+x
+```
+
+> ## Challenge 1
+>
+> Use an `if()` statement to print a suitable message
+> reporting whether there are any records from 2002 in
+> the `gapminder` dataset.
+> Now do the same for 2012.
+>
+> > ## Solution to Challenge 1
+> > We will first see a solution to Challenge 1 which does not use the `any()` function.
+> > We first obtain a logical vector describing which element of `gapminder$year` is equal to `2002`:
+> > ```{r ch10pt1-sol, eval=FALSE}
+> > gapminder[(gapminder$year == 2002),]
+> > ```
+> > Then, we count the number of rows of the data.frame `gapminder` that correspond to the 2002:
+> > ```{r ch10pt2-sol, eval=FALSE}
+> > rows2002_number <- nrow(gapminder[(gapminder$year == 2002),])
+> > ```
+> > The presence of any record for the year 2002 is equivalent to the request that `rows2002_number` is one or more:
+> > ```{r ch10pt3-sol, eval=FALSE}
+> > rows2002_number >= 1
+> > ```
+> > Putting all together, we obtain:
+> > ```{r ch10pt4-sol, eval=FALSE}
+> > if(nrow(gapminder[(gapminder$year == 2002),]) >= 1){
+> >    print("Record(s) for the year 2002 found.")
+> > }
+> > ```
+> >
+> > All this can be done more quickly with `any()`. The logical condition can be expressed as:
+> > ```{r ch10pt5-sol, eval=FALSE}
+> > if(any(gapminder$year == 2002)){
+> >    print("Record(s) for the year 2002 found.")
+> > }
+> > ```
+> >
+> {: .solution}
+{: .challenge}
+
+> ## Tip: `any()` and `all()`
+>
+> The `any()` function will return TRUE if at least one
+> TRUE value is found within a vector, otherwise it will return `FALSE`.
+> This can be used in a similar way to the `%in%` operator.
+> The function `all()`, as the name suggests, will only return `TRUE` if all values in
+> the vector are `TRUE`.
+{: .callout}
+
+Did anyone get a warning message like this?
+
+```{r, echo=FALSE}
+if (gapminder$year == 2012)
+```
+
+If your condition evaluates to a vector with more than one logical element,
+the function `if()` will still run, but will only evaluate the condition in the first
+element. Here you need to make sure your condition is of length 1.
+
+Often, we want to apply an if/else statement to every variable in a list (or value in a column of a data frame), so the `if()` and `else()` functions will not work.
+Instead, we will employ the function `ifelse()`, which takes three arguments: the logical comparison, what to do if `TRUE` and what to do if `FALSE`
+We will use the `ifelse()` function to add a column to the gapminder data that has 6 continents ("Africa", "Asia", "Europe", "NorthAmerica", "Oceania" "SouthAmerica").
+
+First we need to know which countries in the 'Americas' continent belong to either North or South. Here is a list of names of North American countries taken from (https://www.countries-ofthe-world.com/countries-of-north-america.html)  .
+
+``` {r}
+NAmerica <- c("Antigua and Barbuda", "Bahamas", "Barbados", "Belize", "Canada", "Costa Rica", "Cuba", "Dominica", "Dominican Republic", "El Salvador", "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica", "Mexico", "Nicaragua", "Panama", "Puerto Rico", "Saint Kitts and Nevis",  "Saint Lucia", "Saint Vincent and the Grenadines", "Trinidad and Tobago", "United States"
+```
+
+Given this list, we can construct a logic flow to create a vector called `Continent6`.
+First, let's search by 'country', and if the country matches any country in `NAmerica` we will print "NorthAmerica" in the `Continent6` vector.
+
+Then, for rows that have countries that aren't in `NAmerica`, but do have "Americas" in the `Continent` column, we will print "SouthAmerica" in the `Continent6` vector.
+
+Finally, each row that has "Africa", "Asia", "Europe", or "Oceania" in the continent column, we will print that in the 'Continent6' vector
+
+```{r}
+Continent6<- ifelse(gapminder$country %in% NAmerica, "NorthAmerica", ifelse(as.character(gapminder$continent) %in% "Americas", "SouthAmerica", ifelse(gapminder$continent %in% c("Africa", "Asia", "Europe", "Oceania"), paste(gapminder$continent), " ")))
+```
+
+> ## Tip: `==` vs. `%in%`
+>
+> Both `==` vs. `%in%` are comparators for identifying values when one object matches another, however, use `==` only when searching for a unique value. If however, you want all values that match to a list, use `%in%`.
+>
+{: .callout}
+
+
+Now to use this new vector for plotting and other analysis, we need to add it as a column to the gapminder data frame.
+Let's make a new data frame called gapminder_6 with the addition of a Continent_6 column, to do this we need the `cbind()` function which combines columns
+```{r}
+gapminder_6 <- cbind(gapminder,Continent6)
+str(gapminder_6)
+
+```
+
+Now we can use the loop we created before to plot the data in 6 panels, just change the name of a few variables:
+
+```{r}
+
+plot6<-list()
+for (i in unique(gapminder_6$Continent6)) {
+  data1 <-subset(gapminder_6, Continent6==i)
+  plot6[[i]]<- ggplot(data = data1) + geom_line(aes_string(x='year', y='lifeExp', by='country'), color="red")
+  plot6[[i]]<-  plot6[[i]]+ labs(title= i, x="Year", y="Life Expectancy")
+  plot6[[i]]<-  plot6[[i]]+ theme_classic() + labs(title= i, x="Year", y="Life Expectancy")
+  plot6[[i]]<-  plot6[[i]]+ scale_y_continuous(limits= c(0,100), breaks= seq(0,100,10), labels= seq(0,100,10))
+  plot6[[i]]<- plot6[[i]]+ scale_x_continuous(breaks = seq(1952,2007,10), labels=seq(1952,2007,10))
+}
+
+To create the plot, use `grid.arrange` as before:
+```{r}
+grid.arrange(grobs=plot6, nrow=3, top= "Life Expectancy per Continent over Time")
+```
+As before, to save the plot:
+plot6_grob<- arrangeGrob(grobs=plot6, nrow=3, top= "Life Expectancy per Continent over Time")
+ggsave("filename.png", plot6_grob)
+
+
+
+Now that we have a new data frame, let's save it, or 'write it out'. This will allow us to examine the file outside of the R environment, and allow us to pull up these calculations without having to rerun the code next time.
+
+
+---
+title: Writing Data
+teaching: 10
+exercises: 10
+questions:
+- "How can I save plots and data created in R?"
+objectives:
+- "To be able to write out plots and data from R."
+keypoints:
+- "Save plots from RStudio using the 'Export' button."
+- "Use `write.table` to save tabular data."
+source: Rmd
+---
+
+```
+{r, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("11-")library("ggplot2")
+gapminder <- read.csv("data/gapminder-FiveYearData.csv", header=
+TRUE)
+
+dir.create("cleaned-data")
+```
+
+# Writing data
+
+At some point, you'll also want to write out data from R.
+
+We can use the `write.table` function for this, which is
+very similar to `read.table` from before.
+
+To write out our data frame `gapminder_6` use:
+
+```{r}
+write.table(
+  gapminder_6,
+  file="gapminder_6Continents.csv",
+  sep=",", quote=FALSE, row.names=FALSE
+)
+```
+The first two arguments indicate which data object we want to write out and what to call the file. Note the CSV file format, this is format is widely used.
+The next few arguments add important formating considerations, first that we want our new file to have data separated by commas (hence comma separated values format), next we do not want quotes around each value, and finally we do not want the row numbers that R provides for us to be saved to this file.
+
+> ## Challenge 1
+>
+> Create a new dataframe that has only `country` and `gdpPercap` for every country in Africa (all years) and export this data as a csv file to your desktop.
+
+> > ## Solution to challenge 1
+> >
+> > ```{r, eval = FALSE}
+> >
+> > CountryA <- gapminder$country[gapminder$continent=="Africa"]
+> > YearA <- gapminder$year[gapminder$continent=="Africa"]
+> > GDPcapA <- gapminder$gdpPercap[gapminder$continent=="Africa"]
+> > Africa_dataframe<-cbind(CountryA,YearA,GDPcapA)
+> > write.table(Africa_dataframe, file="AfricaDataframeChallenge.csv", sep=",", quote=FALSE, row.names=FALSE)
+> >
+> > Note, make sure to check the .csv file. The country column was stored as a factor, so without converting is to character, it will print integers in the file.
+> > ```
+> {: .solution}
+{: .challenge}
+
+##Saving output.
+The program knitr, offers powerful tools to organize note, code and output including plots in a single file, however, sometimes this functionality is overkill for a given task, or sometimes the output from an R command (in a text file) is what we desire.
+To save only the output of some commands use the `sink()` command.
+
+```{r}
+sink("SinkDemo.txt")
+x<-c(1,2,3,4)
+y<-c(2,3,4,5)
+z<-x+y
+z
+#this is a test
+print("this is a test")
+plot(x,y)
+sink()
+```
+The sink() command actually diverts the output from the R console to a text file, the name of the file is specified in the first `sink()` command, and the second (empty) sink() redirects the output back to the R console and closes the text file.
+Only the text output, and not the input gets printed to the text file (i.e. there is no way of knowing what code generated that output). Comments can be inserted using the print() command.
+
+## Saving plots
+
+You have already seen how to save the most recent plot you create in `ggplot2`,
+using the command `ggsave`. As a refresher:
+
+```
+{r, eval=FALSE}
+ggsave("My_most_recent_plot.pdf")
+```
+
+You can save a plot from within RStudio using the 'Export' button
+in the 'Plot' window. This will give you the option of saving as a
+.pdf or as .png, .jpg or other image formats.
+
+Sometimes you will want to save plots without creating them in the
+'Plot' window first. Perhaps you want to make a pdf document with
+multiple pages: each one a different plot, for example. Or perhaps
+you're looping through multiple subsets of a file, plotting data from
+each subset, and you want to save each plot, but obviously can't stop
+the loop to click 'Export' for each one.
+
+In this case you can use a more flexible approach. The function
+`pdf` creates a new pdf device. You can control the size and resolution
+using the arguments to this function.
+
+```
+{r, eval=FALSE}
+pdf("Life_Exp_vs_time.pdf", width=12, height=4)
+ggplot(data=gapminder, aes(x=year, y=lifeExp, colour=country)) +
+  geom_line() +
+  theme(legend.position = "none")
+
+# You then have to make sure to turn off the pdf device!
+
+dev.off()
+```
+Open up this document and have a look.
+
+The commands `jpeg`, `png` etc. are used similarly to produce
+documents in different formats.
+
+
+---
+title: Functions Explained
+teaching: 45
+exercises: 15
+questions:
+- "How can I write a new function in R?"
+objectives:
+- "Define a function that takes arguments."
+- "Return a value from a function."
+- "Check argument conditions with `stopifnot()` in functions."
+- "Test a function."
+- "Set default values for function arguments."
+- "Explain why we should divide programs into small, single-purpose functions."
+keypoints:
+- "Use `function` to define a new function in R."
+- "Use parameters to pass values into functions."
+- "Use `stopifnot()` to flexibly check function arguments in R."
+- "Load functions into programs using `source()`."
+source: Rmd
+---
+
+```
+{r, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("10-")
+# Silently load in the data so the rest of the lesson works
+gapminder <- read.csv("gapminder-FiveYearData.csv", header=TRUE)
+```
+
+
+If we only had one data set to analyze, it would probably be faster to load the
+file into a spreadsheet and use that to plot simple statistics. However, the
+gapminder data is updated periodically, and we may want to pull in that new
+information later and re-run our analysis again. We may also obtain similar data
+from a different source in the future.
+
+In this lesson, we'll learn how to write a function so that we can repeat
+several operations with a single command.
+
+> ## What is a function?
+>
+> Functions gather a sequence of operations into a whole, preserving it for
+> ongoing use. Functions provide:
+>
+> * a name we can remember and invoke it by
+> * relief from the need to remember the individual operations
+> * a defined set of inputs and expected outputs
+> * rich connections to the larger programming environment
+>
+> As the basic building block of most programming languages, user-defined
+> functions constitute "programming" as much as any single abstraction can. If
+> you have written a function, you are a computer programmer.
+{: .callout}
+
+## Defining a function
+
+Let's open a new R script file in the `functions/` directory and call it
+functions-lesson.R.
+
+```{r}
+my_sum <- function(a, b) {
+  the_sum <- a + b
+  return(the_sum)
+}
+```
+
+Now, we're going to define a function that calculates the Gross Domestic Product
+of a nation from the data available in our dataset:
+
+```{r}
+# Takes a dataset and multiplies the population column
+# with the GDP per capita column.
+calcGDP <- function(dat) {
+  gdp <- dat$pop * dat$gdpPercap
+  return(gdp)
+}
+```
+
+We define `calcGDP()` by assigning it to the output of `function`. The list of
+argument names are contained within parentheses. Next, the body of the function
+-- the statements executed when you call the function -- is contained within
+curly braces (`{}`).
+
+We've indented the statements in the body by two spaces. This makes the code
+easier to read but does not affect how it operates.
+
+When we call the function, the values we pass to it are assigned to the
+arguments, which become variables inside the body of the function.
+
+Inside the function, we use the `return()` function to send back the result.
+This `return()` function is optional: R will automatically return the results of
+whatever command is executed on the last line of the function.
+
+
+```{r}
+calcGDP(head(gapminder))
+```
+
+That's not very informative. Let's add some more arguments so we can extract
+that per year and country. We will do this with some `if` statements.
+
+```{r}
+# Takes a dataset and multiplies the population column
+# with the GDP per capita column.
+calcGDP <- function(dat, year=NULL, country=NULL) {
+  if(!is.null(year)) {
+    dat <- dat[dat$year %in% year, ]
+  }
+  if (!is.null(country)) {
+    dat <- dat[dat$country %in% country,]
+  }
+  gdp <- dat$pop * dat$gdpPercap
+
+  new <- cbind(dat, gdp=gdp)
+  return(new)
+}
+```
+
+
+Ok, so there's a lot going on in this function now. In plain English, the
+function now subsets the provided data by year if the year argument isn't empty,
+then subsets the result by country if the country argument isn't empty. Then it
+calculates the GDP for whatever subset emerges from the previous two steps. The
+function then adds the GDP as a new column to the subsetted data and returns
+this as the final result. You can see that the output is much more informative
+than a vector of numbers.
+
+Let's take a look at what happens when we specify the year:
+
+```{r}
+head(calcGDP(gapminder, year=2007))
+```
+
+Or for a specific country:
+
+```{r}
+calcGDP(gapminder, country="Australia")
+```
+
+Or both:
+
+```{r}
+calcGDP(gapminder, year=2007, country="Australia")
+```
+
+Let's walk through the body of the function:
+
+```
+{r, eval=FALSE}
+calcGDP <- function(dat, year=NULL, country=NULL) {
+```
+
+Here we've added two arguments, `year`, and `country`. We've set
+*default arguments* for both as `NULL` using the `=` operator
+in the function definition. This means that those arguments will
+take on those values unless the user specifies otherwise.
+
+```
+{r, eval=FALSE}
+  if(!is.null(year)) {
+    dat <- dat[dat$year %in% year, ]
+  }
+  if (!is.null(country)) {
+    dat <- dat[dat$country %in% country,]
+  }
+```
+
+Here, we check whether each additional argument is set to `null`, and whenever
+they're not `null` overwrite the dataset stored in `dat` with a subset given by
+the non-`null` argument.
+
+I did this so that our function is more flexible for later. We can ask it to
+calculate the GDP for:
+
+ * The whole dataset;
+ * A single year;
+ * A single country;
+ * A single combination of year and country.
+
+By using `%in%` instead, we can also give multiple years or countries to those
+arguments.
+
+> ## Tip: Pass by value
+>
+> Functions in R almost always make copies of the data to operate on
+> inside of a function body. When we modify `dat` inside the function
+> we are modifying the copy of the gapminder dataset stored in `dat`,
+> not the original variable we gave as the first argument.
+>
+> This is called "pass-by-value" and it makes writing code much safer:
+> you can always be sure that whatever changes you make within the
+> body of the function, stay inside the body of the function.
+{: .callout}
+
+> ## Tip: Function scope
+>
+> Another important concept is scoping: any variables (or functions!) you
+> create or modify inside the body of a function only exist for the lifetime
+> of the function's execution. When we call `calcGDP()`, the variables `dat`,
+> `gdp` and `new` only exist inside the body of the function. Even if we
+> have variables of the same name in our interactive R session, they are
+> not modified in any way when executing a function.
+{: .callout}
+
+```
+{r, eval=FALSE}
+  gdp <- dat$pop * dat$gdpPercap
+  new <- cbind(dat, gdp=gdp)
+  return(new)
+}
+```
+
+Finally, we calculated the GDP on our new subset, and created a new data frame
+with that column added. This means when we call the function later we can see
+the context for the returned GDP values, which is much better than in our first
+attempt where we got a vector of numbers.
+
+> ## Challenge 3
+>
+> Test out your GDP function by calculating the GDP for New Zealand in 1987. How
+> does this differ from New Zealand's GDP in 1952?
+>
+> > ## Solution to challenge 3
+> >
+> > ```{r, eval=FALSE}
+> >   calcGDP(gapminder, year = c(1952, 1987), country = "New Zealand")
+> > ```
+> > GDP for New Zealand in 1987: 65050008703
+> >
+> > GDP for New Zealand in 1952: 21058193787
+> {: .solution}
+{: .challenge}
+
+> ## Tip:   `print()` and `paste()`
+>
+> The commands `print()` and `paste()` can be very useful when the output is intended to be used by humans directly. These commands allow you to add text to the output.
+>
+> ```{r}
+> best_practice <- c("Write", "programs", "for", "people", "not", "computers")
+> paste(best_practice, collapse=" ")
+> ```
+
+## Saving Functions
+
+If you recall early in this workshop, we talked about several 'best practices' for research computing.
+Related to these recommendations is to save functions in separate R script files.
+The advantage is that if we have several different R script files for different types of analysis we can call the function from each of
+these files without coping the function definition over and over. Think of the advantages if that function has to change.
+The `source()`comand allows us to execute R code saved in a different script file; the `source()` command takes the filename of the script you would like to read as an argument.
+
+```
+{r, eval=FALSE}
+source("functions-lesson.R")
+```
+## Interlude: Defensive Programming
+
+Now that we've begun to appreciate how writing functions provides an efficient
+way to make R code re-usable and modular, we should note that it is important
+to ensure that functions only work in their intended use-cases. Checking
+function parameters is related to the concept of _defensive programming_.
+Defensive programming encourages us to frequently check conditions and throw an
+error if something is wrong. These checks are referred to as assertion
+statements because we want to assert some condition is `TRUE` before proceeding.
+They make it easier to debug because they give us a better idea of where the
+errors originate.
+
+### Checking conditions with `stopifnot()`
+
+Let's start by re-examining our `calcGDP` function:
+
+```{r}
+calcGDP <- function(dat, year=NULL, country=NULL) {
+  if(!is.null(year)) {
+    dat <- dat[dat$year %in% year, ]
+  }
+  if (!is.null(country)) {
+    dat <- dat[dat$country %in% country, ]
+  }
+  gdp <- dat$pop * dat$gdpPercap
+  new <- cbind(dat, gdp=gdp)
+  return(new)
+}
+```
+
+For this function to work as intended, the argument `year` must be a `numeric`
+value; otherwise, the subsetting will not work. To create an error, we can use the function `stopifnot()`, which combines an `if` statement and a `stop()` function.
+For example, since the argument `year` must be a `numeric` vector, we
+could check for this condition with `stopifnot()`by adding assertions to
+check the input to our function `calcGDP()`.
+
+We want to assert the following: `year` is a numeric vector. We may do that like
+so:
+
+```{r}
+calcGDP <- function(dat, year=NULL, country=NULL) {
+  if(!is.null(year)) {
+  stopifnot(is.numeric(year))
+        dat <- dat[dat$year %in% year, ]
+  }
+  if (!is.null(country)) {
+    dat <- dat[dat$country %in% country, ]
+  }
+  gdp <- dat$pop * dat$gdpPercap
+  new <- cbind(dat, gdp=gdp)
+  return(new)
+}
+
+```
+
+It still works when given proper input.
+
+```{r}
+# year = 2007
+head(calcGDP(gapminder, year=2007))
+```
+
+But fails instantly if given improper input.
+
+```{r}
+# year = "twothousandandseven"
+head(calcGDP(gapminder, year=twothousandandseven))
+```
+
+An alternative to `stopifnot()` is to write an `if` statement that calls the `stop()` command when a condition is not. The `stop()` command can take a string for the error message as an argument.
+
+```{r}
+calcGDP1 <- function(dat, year=NULL, country=NULL) {
+  if(!is.null(year)) {
+    if (!is.numeric(year)) {
+        stop("year must be numeric.")
+    }
+    dat <- dat[dat$year %in% year, ]
+  }
+  if (!is.null(country)) {
+    dat <- dat[dat$country %in% country,]
+  }
+  gdp <- dat$pop * dat$gdpPercap
+
+  new <- cbind(dat, gdp=gdp)
+  return(new)
+}
+```
+
+> ## Tip
+>
+> R has some unique aspects that can be exploited when performing more
+> complicated operations. We will not be writing anything that requires
+> knowledge of these more advanced concepts. In the future when you are
+> comfortable writing functions in R, you can learn more by reading the
+> [R Language Manual][man] or this [chapter][] from
+> [Advanced R Programming][adv-r] by Hadley Wickham.
+{: .callout}
+
+[man]: http://cran.r-project.org/doc/manuals/r-release/R-lang.html#Environment-objects
+[chapter]: http://adv-r.had.co.nz/Environments.html
+[adv-r]: http://adv-r.had.co.nz/
+
+
+> ## Tip: Testing and documenting
+>
+> It's important to both test functions and document them:
+> Documentation helps you, and others, understand what the
+> purpose of your function is, and how to use it, and its
+> important to make sure that your function actually does
+> what you think.
+>
+> When you first start out, your workflow will probably look a lot
+> like this:
+>
+>  1. Write a function
+>  2. Comment parts of the function to document its behaviour
+>  3. Load in the source file
+>  4. Experiment with it in the console to make sure it behaves
+>     as you expect
+>  5. Make any necessary bug fixes
+>  6. Rinse and repeat.
+>
+> Formal documentation for functions, written in separate `.Rd`
+> files, gets turned into the documentation you see in help
+> files. The [roxygen2][] package allows R coders to write documentation
+> alongside the function code and then process it into the appropriate `.Rd`
+> files. You will want to switch to this more formal method of writing
+> documentation when you start writing more complicated R projects.
+>
+> Formal automated tests can be written using the [testthat][] package.
+{: .callout}
+
+[roxygen2]: http://cran.r-project.org/web/packages/roxygen2/vignettes/rd.html
+[testthat]: http://r-pkgs.had.co.nz/tests.html
+
+
+
+
+---
+---
+Beginning of Day 2
+---
+
+---
+title: Producing Reports With knitr
+teaching: 60
+exercises: 15
+questions:
+- "How can I integrate software and reports?"
+objectives:
+- Value of reproducible reports
+- Basics of Markdown
+- R code chunks
+- Chunk options
+- Inline R code
+- Other output formats
+keypoints:
+- "Mix reporting written in R Markdown with software written in R."
+- "Specify chunk options to control formatting."
+- "Use `knitr` to convert these documents into PDF and other formats."
+source: Rmd
+---
+
+```
+{r chunk_options, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("15-")
+```
+
+
+# Data analysis reports
+
+
+At this point we have created several plots-- each one is it's own file and aside from the, hopefully useful, file name we don't have an easy way to relate which data set or code was used to make that file. In the next section, we will use knitr to create reports that allow integration of code, output and plots.
+
+Data analysts tend to write a lot of reports, describing their
+analyses and results, for their collaborators or to document their
+work for future reference.
+
+
+
+Everything is easier now that I create a web page (as an html
+file). It can be one long stream, so I can use tall figures that
+wouldn't ordinary fit on one page. Scrolling is your friend.
+
+The gold standard of data management in many laboratories is to print a file, hole-punch and put it in a 3-ring binder on the shelf. Though not practical for many data sets this procedure is durable!
+
+We will use knitr to create reports that conveniently combine code, output (including plots), and notes in one document.
+
+## Literate programming
+
+Ideally, such analysis reports are _reproducible_ documents: If an
+error is discovered, or if some additional subjects are added to the
+data, you can just re-compile the report and get the new or corrected
+results (versus having to reconstruct figures, paste them into
+a Word document, and further hand-edit various detailed results).
+
+The key tool for R is [knitr](http://yihui.name/knitr/), which allows
+you to create a document that is a mixture of text and some chunks of
+code. When the document is processed by knitr, chunks of R code will
+be executed, and graphs or other results inserted.
+
+This sort of idea has been called "literate programming".
+
+knitr allows you to mix basically any sort of text with any sort of
+code, but we recommend that you use R Markdown, which mixes Markdown
+with R. Markdown is a light-weight mark-up language for creating web
+pages.
+Think of markdown as a way to convert the ubiquitous nature of text files with more human readable formating, such as headings, bold, and italics. Markdown side-steps the hassle formatting differences among operating systems or closed source programs. The file that we 'mark up' will be converted into an HTML file that we can save and read later.
+
+## Creating a R Markdown file
+
+Within R Studio, click File &rarr; New File &rarr; R Markdown and
+you'll get a dialog box like this:
+
+![](../fig/New_R_Markdown.png)
+
+You can stick with the default (HTML output), but lets give it a useful title:  2018-05_SWC_IntroToR
+Select `ok`
+
+R Studio creates a document with some heading information that we just entered and also some example text. Later we will delete the example code and add our own, but for now lets go through their example.
+
+## Basic components of R Markdown
+
+To get an idea of what R Markdown does, lets compare the markdown file with the html output. To create the html output, click the `Knit` button at the top of the new R markdown file window.
+
+At the top, we can see the information that we added during setup. The formatting here isn't very obvious, but for the rest of the document there will be a clear pattern.
+
+```
+---
+title: "Initial R Markdown document"
+author: "Karl Broman"
+date: "April 23, 2015"
+output: html_document
+---
+```
+
+The next bit on the R Markdown file passes some set-up information about how to use R when running the programs to generate the output and create plots. For now, lets leave that the way it is.
+
+From here, we can see a more close mapping of information that is in the R markdown file to what is in the html file.
+
+The first line 'R Markdown' appears large on the html, this is specified by the hash marks at the beginning of the line.
+You can make section headers of different sizes by initiating a line
+with some number of `#` symbols:
+
+```
+# Title
+## Main section
+### Sub-section
+#### Sub-sub section
+```
+Next, we have a block of normal-looking text, no additional marks are required for this feature. However, portions of this text can be modified to include:
+ - A hyperlink: enclose the url in angle brackets `<example.com>`
+ - Bold: use two pairs of asterisks `**bold**`
+ - Italics: use underscores, like this: `_italics_`.
+ - Bulleted lists can be made by ` - starting the line with a hyphen`e
+ - Additionally code-type font can be made with back ticks
+
+
+
+> ## Challenge
+>
+> Create a new R Markdown document. Delete all of the R code chunks
+> and write a bit of Markdown (some sections, some italicized
+> text, and an itemized list).
+>
+{: .challenge}
+
+
+## A bit more Markdown
+
+You can include an image file like this: `![caption](http://url/for/file)`
+
+You can do subscripts (e.g., H~2~O as in water) with `H~2~O` and superscripts (e.g.,
+2^3^ = 8) with `2^3^`.
+
+## R code chunks
+
+Markdown is interesting and useful, but the real power comes from
+mixing markdown with chunks of R code. This is R Markdown. When
+processed, the R code will be executed; if they produce figures, the
+figures will be inserted in the final document.
+
+The main code chunks look like this:
+
+(<pre>) #Remove parentheses
+&#96;&#96;&#96;{r load_data}
+gapminder <- read.csv("~/Desktop/gapminder.csv")
+&#96;&#96;&#96;
+(</pre>) #Remove parentheses
+
+That is, you place a chunk of R code between <code>&#96;&#96;&#96;{r chunk_name}</code>
+and <code>&#96;&#96;&#96;</code>. It's a good idea to give each chunk
+a name, as they will help you to fix errors and, if any graphs are
+produced, the file names are based on the name of the code chunk that
+produced them.
+
+> ## Challenge
+>
+> Add code chunks to
+>
+> - Load the ggplot2 package
+> - Read the gapminder data
+> - Create a plot, any plot
+{: .challenge}
+
+## How things get compiled
+
+When you press the "Knit HTML" button, the R Markdown document is
+processed by [knitr](http://yihui.name/knitr) and a plain Markdown
+document is produced (as well as, potentially, a set of figure files): the R code is executed
+and replaced by both the input and the output; if figures are
+produced, links to those figures are included.
+
+The Markdown and figure documents are then processed by the tool
+[pandoc](http://pandoc.org/), which converts the Markdown file into an
+html file, with the figures embedded.
+
+```{r rmd_to_html_fig, fig.width=8, fig.height=3, fig.align="left", echo=FALSE}
+par(mar=rep(0, 4), bty="n", cex=1.5)
+plot(0, 0, type="n", xlab="", ylab="", xaxt="n", yaxt="n",
+     xlim=c(0, 100), ylim=c(0, 100))
+xw <- 10
+yh <- 35
+xm <- 12
+ym <- 50
+rect(xm-xw/2, ym-yh/2, xm+xw/2, ym+yh/2, lwd=2)
+text(xm, ym, ".Rmd")
+
+xm <- 50
+ym <- 80
+rect(xm-xw/2, ym-yh/2, xm+xw/2, ym+yh/2, lwd=2)
+text(xm, ym, ".md")
+xm <- 50; ym <- 25
+for(i in c(2, 0, -2))
+    rect(xm-xw/2+i, ym-yh/2+i, xm+xw/2+i, ym+yh/2+i, lwd=2,
+         border="black", col="white")
+text(xm-2, ym-2, "figs/")
+
+xm <- 100-12
+ym <- 50
+rect(xm-xw/2, ym-yh/2, xm+xw/2, ym+yh/2, lwd=2)
+text(xm, ym, ".html")
+
+arrows(22, 50, 38, 50, lwd=2, col="slateblue", len=0.1)
+text((22+38)/2, 60, "knitr", col="darkslateblue", cex=1.3)
+
+arrows(62, 50, 78, 50, lwd=2, col="slateblue", len=0.1)
+text((62+78)/2, 60, "pandoc", col="darkslateblue", cex=1.3)
+```
+
+
+
+
+## Chunk options
+
+There are a variety of options to affect how the code chunks are
+treated.
+
+- Use `echo=FALSE` to avoid having the code itself shown.
+- Use `results="hide"` to avoid having any results printed.
+- Use `eval=FALSE` to have the code shown but not evaluated.
+- Use `warning=FALSE` and `message=FALSE` to hide any warnings or
+  messages produced.
+- Use `fig.height` and `fig.width` to control the size of the figures
+  produced (in inches).
+
+So you might write:
+
+<pre>
+&#96;&#96;&#96;{r load_libraries, echo=FALSE, message=FALSE}
+library("dplyr")
+library("ggplot2")
+&#96;&#96;&#96;
+</pre>
+
+Often there will be particular options that you'll want to use
+repeatedly; for this, you can set _global_ chunk options, like so:
+
+<pre>
+&#96;&#96;&#96;{r global_options, echo=FALSE}
+knitr::opts_chunk$set(fig.path="Figs/", message=FALSE, warning=FALSE,
+                      echo=FALSE, results="hide", fig.width=11)
+&#96;&#96;&#96;
+</pre>
+
+The `fig.path` option defines where the figures will be saved. The `/`
+here is really important; without it, the figures would be saved in
+the standard place but just with names that begin with `Figs`.
+
+If you have multiple R Markdown files in a common directory, you might
+want to use `fig.path` to define separate prefixes for the figure file
+names, like `fig.path="Figs/cleaning-"` and `fig.path="Figs/analysis-"`.
+
+
+
+## Inline R code
+
+You can make _every_ number in your report reproducible. Use
+<code>&#96;r</code> and <code>&#96;</code> for an in-line code chunk,
+like so: <code>&#96;r round(some_value, 2)&#96;</code>. The code will be
+executed and replaced with the _value_ of the result.
+
+Don't let these in-line chunks get split across lines.
+
+Perhaps precede the paragraph with a larger code chunk that does
+calculations and defines things, with `include=FALSE` for that larger
+chunk (which is the same as `echo=FALSE` and `results="hide"`).
+
+## Other output options
+
+You can also convert R Markdown to a PDF or a Word document. Click the
+little triangle next to the "Knit HTML" button to get a drop-down
+menu. Or you could put `pdf_document` or `word_document` in the header
+of the file.
+
+> ## Tip: Creating PDF documents
+>
+> Creating .pdf documents may require installation of some extra software. If
+> required this is detailed in an error message.
+>
+> - [TeX installers for Windows](https://miktex.org/2.9/setup).
+> - [TeX installers for macOS](https://tug.org/mactex).
+{: .callout}
+
+
+> ## Challenge
+>
+> Let's use knitr to make a file describing what we've done so far:
+>  - Load data
+>  - Add a library [ggplot]
+>  - Examine the data structure [str()]
+>  - Create a plot, or several
+{: .challenge}
+
+
+
+
+## Resources
+
+- [Knitr in a knutshell tutorial](http://kbroman.org/knitr_knutshell)
+- [Dynamic Documents with R and knitr](http://www.amazon.com/exec/obidos/ASIN/1482203537/7210-20) (book)
+- [R Markdown documentation](http://rmarkdown.rstudio.com)
+- [R Markdown cheat sheet](http://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+* [Getting started with R Markdown](https://www.rstudio.com/resources/webinars/getting-started-with-r-markdown/)
+* [Reproducible Reporting](https://www.rstudio.com/resources/webinars/reproducible-reporting/)
+* [The Ecosystem of R Markdown](https://www.rstudio.com/resources/webinars/the-ecosystem-of-r-markdown/)
+* [Introducing Bookdown](https://www.rstudio.com/resources/webinars/introducing-bookdown/)

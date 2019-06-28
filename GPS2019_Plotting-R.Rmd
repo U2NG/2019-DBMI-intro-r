@@ -1,0 +1,545 @@
+---
+title: "GPS2019_Plotting-R"
+output: html_document
+---
+```{r}
+knitr::opts_chunk$set(fig.width=2, fig.height=2)
+```
+
+
+# PLOTTING WITH R (GGPLOT)
+## CONTENTS:
+ 1. Preliminaries
+ 2. Intro to plotting
+ 3. Saving plots
+ 4. Improving plot appearence
+ 5. More labels
+ 6. Line plots
+ 7. Selecting plot colors
+ 8. Repeating operations (loops)
+ 9. Multipanel plots
+ 
+ 
+##OBJECTIVES:
+To Learn:
+- How to use ggplot2 to generate publication quality graphics  
+- How to save plots  
+- How to apply geometry, aesthetic, and statistics layers to a ggplot plot  
+- How to manipulate the aesthetics of a plot using different colors, shapes, and lines  
+- How to improve data visualization through transforming scales and paneling  
+- To practice concepts presented in session 1 (Intro to R) to make plots  
+- How to repeat actions with loops  
+- How to make multi-panel plots  
+- How to make data-dependent choices  
+- How to write data out to a new file  
+
+Material adapted from SWC "R for Reproducable Scientific Analysis"
+https://swcarpentry.github.io/r-novice-gapminder/
+
+##PRELIMINARIES
+1. Open Rstudio
+2. Set working directory (Desktop/data), hopefully `gapminder.csv` is still there!
+3. Load the gapminder dataset
+```{r}
+gapminder <- read.csv(file = "gapminder.csv")
+```
+4. Load the libraries 
+```{r warning=FALSE}
+library(knitr)
+library(ggplot2)
+library(gridExtra)
+```
+## INTRO TO PLOTTING WITH R
+Plotting our data is one of the best ways to
+quickly explore it and the various relationships
+between variables.
+
+There are three main plotting systems in R:
+ - [base]: http://www.statmethods.net/graphs/   
+ - [lattice]: http://www.statmethods.net/advgraphs/trellis.html   
+ - [ggplot2]: http://www.statmethods.net/advgraphs/ggplot2.html   
+
+Today we'll be learning about the ggplot2 package, because it is the most effective and powerful method of creating publication quality graphics.
+
+ggplot2 is built on the grammar of graphics, the idea that any plot can be expressed from the same set of components: a **data** set, a **coordinate system**, and a set of **geoms**--the visual representation of data points.
+
+The key to understanding ggplot2 is thinking about a figure in layers. This idea may be familiar to you if you have used image editing programs like Photoshop, Illustrator, or
+Inkscape.
+
+Let's start off with an example, let's look at the relationship between gdp per capita
+and life expectancy:
+
+```{r lifeExp-vs-gdpPercap-scatter, message=FALSE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point()
+```
+
+So the first thing we do is call the `ggplot` function. This function lets R know that we're creating a new plot, and any of the arguments we give the `ggplot` function are the *global* options for the plot: they apply to all layers on the plot.
+
+We've passed in two arguments to `ggplot`. First, we tell `ggplot` what data we want to show on our figure, in this example the gapminder data we read in earlier. For the second argument we passed in the `aes` function, which tells `ggplot` how variables in the **data** map to *aesthetic* properties of the figure, in this case the **x** and **y** locations. Here we told `ggplot` we want to plot the "gdpPercap" column of the gapminder data frame on the x-axis, and the "lifeExp" column on the y-axis. Notice that we didn't need to explicitly pass `aes` these columns (e.g. `x = gapminder[, "gdpPercap"]`), this is because `ggplot` is smart enough to know to look in the **data** for that column!
+
+By itself, the call to `ggplot` isn't enough to draw a figure:
+
+```{r}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp))
+```
+
+We need to tell `ggplot` how we want to visually represent the data, which we do by adding a new **geom** layer. In our example, we used `geom_point`, which tells `ggplot` we want to visually represent the relationship between **x** and **y** as a scatterplot of points:
+
+```{r lifeExp-vs-gdpPercap-scatter2}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+Great, now we have our first plot! 
+Let's look at options for saving the plot next.
+
+## SAVING PLOTS
+RStudio has a window for displaying plots, there are several options for navigating and saivng plots in the option bar of that window. 
+Saving plots can also be scripted using ggsave()
+
+```
+ggsave("LifeExpectancy_by_GDPperCap.pdf")
+```
+Another option is to use the pdf() function. This option saves the plot without displaying it in RStudio, which can be useful if a bunch of plots are to be genrated, or if additional options are needed. Size is defined in inches
+
+```{r eval=TRUE}
+pdf("gdpPercap_vs_time.pdf", width=8, height=8)
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+
+# You then have to make sure to turn off the pdf device!
+
+dev.off()
+```
+Similarly the commands jpeg(), or png() can be used in palce of pdf() to save plots in these otehr formats.
+
+## IMPROVING PLOT APPERANCE
+Lets start with one modification to change the theme of the plot, to make it a little more publishable in standard scientific journals!
+
+```{r lifeExp-vs-gdpPercap-scatter2.1}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + theme_classic()
+```
+
+There are several different themes that can help get you started, many are availble in the base ggplot library, but many more avalible through additional libraries
+
+For example, in the ggthemes, you can emulate The Economist Magazine with 
+```{r eval=FALSE}
++ theme_economist()
+```
+
+```{r echo = FALSE}
+#install.packages("ggthemes")
+library(ggthemes)
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + theme_economist()
+```
+
+
+## LINE PLOTS
+In the last example, we used the `geom-point()` to create a scatter plot, but there are numerous options depending on the data type. Since we have data over time, let's create a line plot.
+
+```{r lifeExp-line}
+ggplot(data = gapminder, aes(x=year, y=lifeExp, by=country)) +
+  geom_line()
+```
+
+Instead of adding a `geom_point` layer, we've added a `geom_line` layer. We've added the **by** *aesthetic*, which tells `ggplot` to draw a line for each country.
+
+But what if we want to visualize both lines and points on the plot? We can simply add another layer to the plot:
+
+```{r lifeExp-line-point}
+ggplot(data = gapminder, aes(x=year, y=lifeExp, by=country, color=continent)) +
+  geom_line() + geom_point()
+```
+
+In ggplot, everything is added to the plot in layers with each layer drawn on top of the previous layer. To demonstrate, lets add some color, in this example the points are drawn *on top of* the lines.
+
+```{r lifeExp-layers-1}
+ggplot(data = gapminder, aes(x = year, y = lifeExp, by = country)) +
+  geom_line(aes(color = continent)) + geom_point(color = "black")
+```
+
+In contrast, in this example, the lines are drawn on top of the points.
+
+```{r lifeExp-layers-2}
+ggplot(data = gapminder, aes(x = year, y = lifeExp, by = country)) + geom_point(color = "black") + geom_line(aes(color = continent))
+```
+
+> ## Tip: Setting an aesthetic to a value instead of a mapping
+>
+> So far, we've seen how to use an aesthetic (such as **color**) as a *mapping* to a
+> variable in the data. For example, when we use `geom_line(aes(color=continent))`, ggplot
+> will give a  different color to each continent.  
+> - What if we want to change the color of all lines to blue? You may think that
+>`geom_line(aes(color="blue"))` should work, but it doesn't. Since we don't want to
+> create a mapping to a specific variable, we simply move the color specification
+> outside of the `aes()` function, like this: `geom_line(color="blue")`. Generally, if it
+> is a *constant* (i.e. it does not change with data) place it outside of the `aes()` function.
+>`ggplot(data = gapminder, aes(x=year, y=lifeExp, by=country)) + geom_line(color="blue")`
+
+
+##SUBSETTING DATA
+For the next plot, lets use our subsetting skills to highlight a subsection of the data set. Curious about the continent of "Ocenaia"? lets look!
+
+To highlight the values from Ocenaia on a plot, we need to plot these on top of the other
+data points. To do this we will plot all of the points in red, and then plot the points
+from Oceana in black on top of the other points.
+Now, what if we want to highlight values from one Continent, lets say Oceania, by making them black (other points red), and prominently displayed?One approch to this problem is to plot all the countries in red, then plot Oceania in black on top (a layer specified in correct order).
+
+Lets reveiw from last session:
+  There are a few ways to subset data in R:  
+  1. Use square brackets (`[]`) to select row number and column number  
+  2. Use square brackets (`[]`) to select rows and columns by name.  
+  3. Subsetting can also be achieved with the `subset()` function, which takes 3 arguments: data frame, row selection and column selection  
+
+For this problem, I think the subset() function is the most stright forward.
+
+```{r}
+ggplot(data = gapminder) + geom_line(aes(x=year, y=lifeExp, by=country), color="red") + geom_line(data = subset(gapminder, continent=="Oceania"), aes(x=year, y=lifeExp, by=country), color="black")
+```
+Since our code is getting long, lets look at another convention to improve human readability. Remember that ggplot is based on layers that can be built sequentially, and that we can store and update data saved as variables.
+
+```{r oceania-in-red}
+p <- ggplot(data = gapminder) 
+p <- p + geom_line(aes(x=year, y=lifeExp, by=country), color="red")
+p <- p + geom_line(data = subset(gapminder, continent=="Oceania"), aes(x=year, y=lifeExp, by=country), color="black")
+p
+```
+
+
+Key points:
+  - Plots are layered
+  - Individual subsets of data can be plotted
+  - When all data points are to be the same color, the color argument goes outside
+   of the `aes()` function.
+   
+##Lables for Plots
+
+Now, lets change the titles of the axes to "Year" and "Life Expectancy"
+`+ labs(title= "Oceania on the Rise", x="Year", y="Life Expectancy")`
+
+Let's also change the scale on the Y-axis to 0 - 100: this looks more complicated than it is, but the function for altering the y axis takes several arguments:
+  - limits: how far the axis extends
+  - breaks: where the tick marks are
+  - labels: where the labels for the ticks go
+  Note, to specify exactly where the ticks and labels go, use `seq(0,100,10)` to
+  generate a sequence of numbers from 0 to 100, each 10 apart.
+
+`+ scale_y_continuous(limits= c(0,100), breaks = seq(0,100,10), labels= seq(0,100,10))`
+
+Let's also clean up the X-axis, moving the ticks over to the sampling years, since it would be nice to have the lables match the data points.
+
+`+ scale_x_continuous(breaks = seq(1952,2007,5), labels=seq(1952,2007,5))`
+
+Also, since our code is getting long, let's use a slightly differnet convention to imrove readability, each function can be added on since the plot consists of layers. Just don't forget to call `P` (or whatever you decide to call it) at the end
+```{r warning=FALSE}
+P <- ggplot(data = gapminder) 
+P <- P + geom_line(aes(x = year, y = lifeExp, by = country), color = "red")
+P <- P + geom_line(data = subset(gapminder, continent == "Oceania"), aes(x = year, y = lifeExp, by  =country), color = "black")
+P <- P + theme_classic()
+P <- P + labs(title = "Oceania on the Rise", x = "Year", y = "Life Expectancy")
+P <- P + scale_y_continuous(limits = c(0,100), breaks = seq(0,100,10), labels = seq(0,100,10))
+P <- P + scale_x_continuous(breaks = seq(1952,2007,5), labels = seq(1952,2007,5))
+P
+```
+
+## COLORS
+In the last plot, the color palette were selected by R, this is often a helpful place to start, but rarely what we actually want. We can specify colors using the `scale_colour_manual()` function. Inside the parentheses specify the colors you want. Colors can be specified by their name (e.g. "black", "red", "green" etc.) or with hexadecimal codes. There are several possibilities for selecting colors!
+ - All colors the same: use `color="DesiredColor"` (outside of `aes()``)
+ ```{r colors-outside-aes} 
+ggplot(data = gapminder) +geom_line(aes(x=year, y=lifeExp, by=country), color='darkOliveGreen')
+```
+
+### Data points colored differently relative to group assignment **(R standard)**:   
+Use `color="ColumnName"` inside of `aes()` 
+```{r colors-inside-aes}
+ggplot(data = gapminder) +geom_line(aes(x=year, y=lifeExp, by=country, color=continent))
+```
+
+### Data points colored differently relative to group assignment **(Manually selected)**:  
+Use `+ scale_colour_manual(values="SelectedColors")` 
+Note: you must provide the same number
+ of colors as number of groups to color
+ 
+```{r colors-manual-selection}
+ggplot(data = gapminder) + geom_line(aes(x = year, y = lifeExp,by = country, color = continent)) +scale_colour_manual(values = c('red','green','pink','yellow', 'black'))
+```
+
+
+## REPEATING OPERATIONS (loops)
+
+If you want to iterate over a set of values, when the order of iteration is important, and perform the same operation on each, a `for()` loop will do the job.
+
+The basic structure of a `for()` loop is:
+
+``` {r, eval=FALSE}
+for(iterator in set of values){
+  do a thing
+}
+```
+
+For example:
+
+```{r loop-example}
+for(i in 1:10){
+  print(i)
+}
+```
+
+The `1:10` bit creates a vector on the fly; you can iterate
+over any other vector as well.
+
+Note `paste()` allows concatenation of characters, allows you to 'paste' together characters. This is often useful for constructing sentences or messages that have some fixed text with a variable (output of some code) inserted inside. For example you may print a message to say "the last loop printed 25 lines" where 25 is the output from some function and the other words are supplied manually
+
+Rather than printing the results, we could write the loop output to a new object.
+
+```{r}
+output_vector <- c()
+for(i in 1:5){
+  for(j in c('a', 'b', 'c', 'd', 'e')){
+    temp_output <- paste(i, j)
+    output_vector <- c(output_vector, temp_output)
+  }
+}
+output_vector
+```
+
+A better way is to define your (empty) output object before filling in the values.
+For this example, it looks more involved, but is still more efficient.
+
+> ### Tip: Efficieny
+> The goal of hte class is to get you started doing useful things with the R programing language. There are lots of concepts and tools that we cannot cover here, though theyare particularly salient to this topic.   
+> 1. Computational efficiency: Looping in R is not particualry efficient and it is made worse by the way our vector gets larger during each iteration of the loop   
+> 2. R has some important features for applying functions to entire vectors, consider learning about the apply() family of functions.
+
+> ### Tip: While loops
+>
+> Sometimes you will find yourself needing to repeat an operation until a certain condition is met. You can do this with a `while()` loop.
+>
+> ```{r eval=FALSE}
+> while(this condition is true){
+>   do a thing
+> }
+> ```
+> `while()` loops will not always be appropriate. You have to be particularly careful that you don't end up in an infinite loop because your condition is never met.
+
+
+Let's use a for loop to create a few plots
+
+```{r plot-for-each-continent}
+plotC<-list()
+for (i in unique(gapminder$continent)) {
+  data1 <-subset(gapminder, continent==i)
+  plotC[[i]]<- ggplot(data = data1) + geom_line(aes_string(x='year', y='lifeExp', by='country'), color="red")
+  plotC[[i]]<- plotC[[i]] + labs(title= i, x="Year", y="Life Expectancy") + theme_classic()
+  plotC[[i]]<- plotC[[i]] + scale_y_continuous(limits= c(0,100), breaks = seq(0,100,20), labels= seq(0,100,20))
+  plotC[[i]]<- plotC[[i]] + scale_x_continuous(breaks = seq(1952,2007,10), labels=seq(1952,2007,10))
+}
+plotC
+```
+This code chunk has several parts:  
+1. Create an empty list called `plotC` this is where our plots well be stored.  
+2. Our for loop starts:     
+  -Our iterator is called `i`, whichis a common placeholder name.  
+  -`unique(gapminder$continent)` makes a list of the 5 continents (without duplicates)    
+  -Now we will make a variable called `data1` that has all the gapminder data for the current continent, each time through the loop, different data will be stored here and then  over-written on the next loop.  
+  -Next we will use `ggplot()` to create a plot that will be stored in the list `plotC` that we created earlier. The double brackets indicate which position in the list to store our plot, **if we didnt do this our plot would be over-written each time.**  
+  -Next we will keep adding features to our plot like we have before.  
+  -At the curly braces, the loop starts over, it selects the next continetn in our list without duplicates, subsets the data, makes a plot and comes back again.  
+  -Finally, outside of our loop we call `plotC` to display the plots that westored there.  
+
+**Now we have a bunch of plots, but Rstudio only let's us see one at a time, it would be more convient and useful if we could display them all togetheras one plot multiple panels.**
+
+The "gridExtra" library has a useful tool for creating plots with multiple panels.
+
+Remeber that to use a package, it must be intalled and loaded.
+```{r eval=FALSE}
+#install.packages("gridExtra")
+library("gridExtra")
+```
+To arrange the panels use:
+```{r}
+grid.arrange(grobs=plotC, nrow=3)
+```
+
+Here, `plotC` is the list we made in the loop that has all of the plots in it and `nrow=3` directs plots to printed into 3 rows
+
+A strange consequence of grid.arrange is that it displays the multi-panel plot in the viewer, but `ggsave()` will only capture the last plot (Oceania). To save this image we need another statement:
+
+```{r saved-multi-panel}
+plotC_grob<- arrangeGrob(grobs=plotC, nrow=3, top= "Life Expectancy per Continent over Time")
+ggsave("filename.png", plotC_grob)
+```
+
+So we made a plot, but the text doesnt fit very well, so toadjust the font on a plot we can use the `theme()` function. Because this is a feature of each plot that we want to change, we need to add the theme to our ggplot function, which was in the loop.
+```{r eval=FALSE}
+theme(axis.text.x = element_text(size=6), axis.text.y = element_text(size=6), axis.title.x = element_text(size=6), axis.title.y = element_text(size=6))
+```
+
+So to put it all together, we have:
+
+```{r multi-panel-plot-2}
+plotC<-list()
+for (i in unique(gapminder$continent)) {
+  data1 <-subset(gapminder, continent==i)
+  plotC[[i]]<- ggplot(data = data1) + geom_line(aes_string(x='year', y='lifeExp', by='country'), color="red")
+  plotC[[i]]<- plotC[[i]] + labs(title= i, x="Year", y="Life Expectancy") + theme_classic()
+  plotC[[i]]<- plotC[[i]] + scale_y_continuous(limits= c(0,100), breaks = seq(0,100,20), labels= seq(0,100,20))
+  plotC[[i]]<- plotC[[i]] + scale_x_continuous(breaks = seq(1952,2007,10), labels=seq(1952,2007,10))
+  plotC[[i]]<- plotC[[i]]  + theme(axis.text.x = element_text(size=8))
+  plotC[[i]]<- plotC[[i]]  + theme(axis.text.y = element_text(size=8))
+  plotC[[i]]<- plotC[[i]]  + theme(axis.title.x = element_text(size=8))
+  plotC[[i]]<- plotC[[i]]  + theme(axis.title.y = element_text(size=8))
+}  
+grid.arrange(grobs=plotC, nrow=3)
+plotC_grob<- arrangeGrob(grobs=plotC, nrow=3, top= "Life Expectancy per Continent over Time")
+ggsave("MultiPanelPlotContinent.pdf", plotC_grob)
+```
+
+## Data dependent choices (if statements)
+
+Let's review if statements from last week, becuase we will use them for creating a new column
+
+``` {r, eval=FALSE}
+# if
+if (condition is true) {
+  perform action
+}
+
+# if ... else
+if (condition is true) {
+  perform action
+} else {  # that is, if the condition is false,
+  perform alternative action
+}
+```
+
+Often, we want to apply an if/else statement to every variable in a list (or value in
+a column of a data frame), so the `if()` and `else()` functions will not work.
+Instead, we will employ the function `ifelse()`, which takes three arguments: the logical
+comparison, what to do if `TRUE` and what to do if `FALSE`
+
+We will use the `ifelse()` function to add a column to the gapminder data that has 6
+continents ("Africa", "Asia", "Europe", "NorthAmerica", "Oceania" "SouthAmerica").
+
+First we need to know which countries in the 'Americas' continent belong to either North
+or South. Here is a list of names of North American countries taken from
+(https://www.countries-ofthe-world.com/countries-of-north-america.html)  .
+
+```{r}
+NAmerica <- c("Antigua and Barbuda", "Bahamas", "Barbados", "Belize", "Canada", "Costa Rica", "Cuba", "Dominica", "Dominican Republic", "El Salvador", "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica", "Mexico", "Nicaragua", "Panama", "Puerto Rico", "Saint Kitts and Nevis",  "Saint Lucia", "Saint Vincent and the Grenadines", "Trinidad and Tobago", "United States")
+```
+
+Given this list, we can construct a logic flow to create a vector called `Continent6`.
+First, let's search by 'country', and if the country matches any country in `NAmerica`
+we will print "NorthAmerica" in the `Continent6` vector.
+
+Then, for rows that have countries that aren't in `NAmerica`, but do have "Americas" in
+ the `Continent` column, we will print "SouthAmerica" in the `Continent6` vector.
+
+Finally, each row that has "Africa", "Asia", "Europe", or "Oceania" in the continent column,
+ we will print that in the 'Continent6' vector
+
+```{r withAsCharacter}
+Continent6<- ifelse(gapminder$country %in% NAmerica, "NorthAmerica", ifelse(as.character(gapminder$continent) %in% "Americas", "SouthAmerica", ifelse(gapminder$continent %in% c("Africa", "Asia", "Europe", "Oceania"), paste(gapminder$continent), " ")))
+```
+
+
+```{r withoutAsCharacter}
+Continent6<- ifelse(gapminder$country %in% NAmerica, "NorthAmerica", ifelse(gapminder$continent %in% "Americas", "SouthAmerica", ifelse(gapminder$continent %in% c("Africa", "Asia", "Europe", "Oceania"), paste(gapminder$continent), " ")))
+```
+> ### Tip: `==` vs. `%in%`
+>
+> Both `==` vs. `%in%` are comparators for identifying values when one object matches another, however, use `==` only when searching for a unique value. If however, you want all values that match to a list, use `%in%`.
+
+Now to use this new vector for plotting and other analysis, we need to add it as a
+column to the gapminder data frame.
+Let's make a new data frame called gapminder_6 with the addition of a Continent_6
+column, to do this we need the `cbind()` function which combines columns
+
+```{r}
+gapminder_6 <- cbind(gapminder,Continent6)
+str(gapminder_6)
+```
+
+Now we can use the loop we created before to plot the data in 6 panels, just change
+the name of a few variables:
+
+```{r}
+plot6<-list()
+for (i in unique(gapminder_6$Continent6)) {
+  data1 <-subset(gapminder_6, Continent6==i)
+  plot6[[i]]<- ggplot(data = data1) + geom_line(aes_string(x='year', y='lifeExp',
+    by='country'), color="red")
+  plot6[[i]]<-  plot6[[i]]+ labs(title= i, x="Year", y="Life Expectancy")
+  plot6[[i]]<-  plot6[[i]]+ theme_classic() + labs(title= i, x="Year", y="Life Expectancy")
+  plot6[[i]]<-  plot6[[i]]+ scale_y_continuous(limits= c(0,100), breaks= seq(0,100,10),
+    labels= seq(0,100,10))
+  plot6[[i]]<- plot6[[i]]+ scale_x_continuous(breaks = seq(1952,2007,10),
+    labels=seq(1952,2007,10))
+}
+```
+To create the plot, use `grid.arrange` as before:
+```{r}
+grid.arrange(grobs=plot6, nrow=3, top= "Life Expectancy per Continent over Time")
+```
+As before, to save the plot:
+```{r}
+plot6_grob<- arrangeGrob(grobs=plot6, nrow=3, top= "Life Expectancy per Continent over Time")
+ggsave("multi-panel-plot-6.png", plot6_grob)
+```
+
+## WRITING DATA
+At some point, you'll also want to write out data from R.
+
+We can use the `write.table` function for this, which is very similar to `read.table` from before.
+To write out our data frame `gapminder_6` use:
+
+```{r}
+write.table(
+  gapminder_6,
+  file="gapminder_6Continents.csv",
+  sep=",", quote=FALSE, row.names=FALSE
+)
+```
+The first two arguments indicate which data object we want to write out and what to call the file. Note the CSV file format, this is format is widely used.
+The next few arguments add important formating considerations, first that we want our new file to have data separated by commas (hence comma separated values format), next we do not want quotes around each value, and finally we do not want the row numbers that R provides for us to be saved to this file.
+
+## Exploring Data Sets
+So far we've made a number of interesting plots, and there appear to be some interesting patterns, to follow up on these, nlets look at a few functions to serch data sets
+
+lets look at back at one of our first plots: 
+```{r message=FALSE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point()
+```
+There appear to be some interesting data points with really high gdpPercap values, but average life expectancies, lets look at some tools for finding out which countries those data come from.
+
+one method to find that maximum value in the gdpPercap column, is to use the `max()` function
+```{r eval=FALSE}
+gapminder[gapminder$gdpPercap==max(gapminder$gdpPercap),]
+```
+Similarly, we could use the `min()` function to find the lowest point.
+
+But, what if we want to know which are the top 5 higest datapoints?
+The easiest way might be with the `order()` function
+
+```{r eval=FALSE}
+gapminder[order(gapminder$pop),]
+```
+Notice that this appears to show the lowest values for gdpPercap, so there are two options the first is to use the `tail()` function to look at the end of this vector (where the highest values are).
+```{r eval=FALSE}
+tail(gapminder[order(gapminder$pop),],5)
+```
+Another option is to use the `decreasing = TRUE` argument in the `sort()` function.
+```{r eval=FALSE}
+gapminder[order(gapminder$pop, decreasing = TRUE),]
+```
+
+One last manipulation that will be useful is the`diff()` command which calculates the difference between each sucessive row. This can be used to create another vector with the differnces between sucessive rows of another column.
+```{r}
+Differences <- c(0, diff(gapminder$year))
+```
+This command creates a vector, the first element is 0, then the rest is the difference in each succeding row.
+
+

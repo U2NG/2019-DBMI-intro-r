@@ -1,0 +1,870 @@
+---
+title: "GPS-2019_INTRO_R"
+output: html_document
+---
+
+Material adapted from SWC "R for Reproducable Scientific Analysis"
+https://swcarpentry.github.io/r-novice-gapminder/
+
+
+## OBJECTIVES:
+To learn:  
+  -How to interact with RStudio  
+  -How to install packages  
+  -How to define a variable  
+  -How to use mathmatical and comparitive operators  
+  -How to use bulit in functions (the syntax of R)  
+  -How to read data into R  
+  -How to recognize the basic data types in R  
+  -How to explore thge structure of data sets   
+  -How to explore a subset of data  
+  -How to make data dependent choices  
+  -How to make reports in knitr  
+  
+## Part 1: INTRO TO R and RStudio
+
+#### In this lesson, we will:
+* Open Rstudio and have a quick look around
+* Load the gapminder data set
+* Examine the structure and contents of the data set
+
+First, what is R?
+  R is an opensource progrmaing language that was designed for data analysis.
+  The two freedoms...
+  
+  RStudio is an environment for using R. RStudio is not necessary to use R, but it makes it a lot easier
+  We'll be using RStudio: a free, open source R integrated development
+environment. It provides a built in editor, works on all platforms (including
+on servers) and provides many advantages such as integration with version
+control and project management.
+  
+Once you open files, such as R scripts (file > new file > script), an editor panel
+will also open in the top left, giving us four panels, the R console is now on the
+bottom left.
+The Rscript: this is basically a text file that you can type into and save on
+your computer
+
+## Work flow within RStudio
+There are two main ways you can work within RStudio.
+
+1. Test and play within the interactive R console then copy code into
+a .R file to run later.
+   *  This works well when doing small tests and initially starting off.
+   *  It quickly becomes laborious
+2. Start writing in an .R file and use RStudio's short cut keys for the Run command
+to push the current line, selected lines or modified lines to the
+interactive R console.
+   * This is a great way to start; all your code is saved for later
+   * You will be able to run the file you create from within RStudio
+   or using R's `source()`  function.
+   * The line of code that the cursor is on can be run with the shortcut: `Control` + `Enter`
+   * To run multiple lines of code, highlight the selection and press `Control` + `Enter`
+   * On OS X use  key with apple symbol +`Enter`
+   
+   
+Much of your time in R will be spent in the R interactive
+console. This is where you will run all of your code, and can be a
+useful environment to try out ideas before adding them to an R script
+file. This console in RStudio is the same as the one you would get if
+you typed in `R` in your command-line environment.
+
+The first thing you will see in the R interactive session is a bunch
+of information, followed by a ">" and a blinking cursor. In many ways
+this is similar to the shell environment you learned about during the
+shell lessons: it operates on the same idea of a "Read, evaluate,
+print loop": you type in commands, R tries to execute them, and then
+returns a result.  
+
+#### Tip: Keep an eye on the prompt
+As you will see, R expects complete functions, if you run an incomplete line of code, R will expect you to finish, until that function is completed the prompt will appear as a "+" and will not evaluate new functions as expected.
+
+If you see the "+" prompt:  
+  *finish that code (often end quotes or close parantheses are the culprit)  
+  *Cancel that input by pressing `esc`  
+  
+## Mathmatical Operatons:  
+ R can do arithmetic:
+
+```{r}
+1 + 100
+```
+
+R will print out the answer, with a preceding "[1]". Don't worry about this.
+For now think of it as indicating output.
+
+When using R as a calculator, the order of operations is the same as you might
+expect: from highest to lowest precedence:
+
+ - Parentheses: `(`, `)`
+ - Exponents: `^` or `**`
+ - Divide: `/`
+ - Multiply: `*`
+ - Add: `+`
+ - Subtract: `-`
+
+```{r}
+3 + 5 * 2
+```
+
+Use parentheses to group operations in order to force the order of
+evaluation if it differs from the default, or to make clear what you
+intend.
+
+```{r}
+(3 + 5) * 2
+```
+  
+### Mathematical functions
+
+R has many built in mathematical functions. To call a function,
+we type its name, followed by  open and closing parentheses.
+Anything we type inside the parentheses is called the function's
+arguments:
+
+```{r}
+sin(1)  # trigonometry functions
+```
+
+```{r}
+log(10)  # natural logarithm
+```
+
+
+Don't worry about trying to remember every function in R. You
+can look them up on online, or if you can remember the
+start of the function's name, use the tab completion in RStudio.
+
+One advantage that RStudio has over R on its own, it
+has auto-completion abilities that allow you to more easily
+look up functions, their arguments, and the values that they
+take.
+
+Typing a `?` before the name of a command will open the help page
+for that command. As well as providing a detailed description of
+the command and how it works, scrolling to the bottom of the
+help page will usually show a collection of code examples which
+illustrate command usage. We'll go through an example later.
+
+## Getting help
+There are many ways to get help:  
+ - Typing a `?` before the name of a command will open the help page
+for that command.  
+ - Tab complete can be useful if you know how the command starts  
+ - Internet search  
+
+
+## Comparing things (logical operators)
+
+We can also do comparisons in R:
+
+```{r}
+1 == 1  # equality (note two equals signs, read as "is equal to")
+```
+
+```{r}
+1 != 2  # inequality (read as "is not equal to")
+```
+
+```{r}
+1 < 2  # less than
+```
+
+```{r}
+1 <= 1  # less than or equal to
+```
+
+```{r}
+1 > 0  # greater than
+```
+
+```{r}
+1 >= -9 # greater than or equal to
+```
+The output for each of these functions will be either TRUE or FALSE
+
+#### Tip: Comparing Numbers
+
+ A word of warning about comparing numbers: you should
+ not use `==` to compare two numbers unless they are
+ integers (a data type which can specifically represent
+ only whole numbers).
+
+ Computers may only represent decimal numbers with a
+ certain degree of precision, so two numbers which look
+ the same when printed out by R, may actually have
+ different underlying representations and therefore be
+ different by a small margin of error (called Machine
+ numeric tolerance).
+
+ Instead you should use the `all.equal` function.
+```{r}
+ all.equal(1.2, 1.2)
+```
+ Further reading: [http://floating-point-gui.de/](http://floating-point-gui.de/)
+
+## Variables and Assignemnt
+We can store values in variables using the assignment operator `<-`, like this:
+
+```{r}
+x <- 1/40
+```
+
+Notice that assignment does not print a value. Instead, we stored it for later
+in something called a **variable**. `x` now contains the **value** `0.025`:
+
+```{r}
+x
+```
+
+More precisely, the stored value is a *decimal approximation* of
+this fraction called a [floating point number](http://en.wikipedia.org/wiki/Floating_point).
+
+Look for the `Environment` tab in the upper right panel of RStudio, and you will see that `x` and its value
+have appeared. Our variable `x` can be used in place of a number in any calculation that expects a number:
+
+```{r}
+log(x)
+```
+
+Notice also that variables can be reassigned:
+
+```{r}
+x <- 100
+```
+
+`x` used to contain the value 0.025 and and now it has the value 100.
+
+Assignment values can contain the variable being assigned to:
+
+```{r}
+x <- x + 1
+y <- x * 2
+```
+
+The right hand side of the assignment can be any valid R expression.
+The right hand side is *fully evaluated* before the assignment occurs.
+
+**Variable names** can contain letters, numbers, underscores and periods. They
+cannot start with a number nor contain spaces at all. Different people use
+different conventions for long variable names, these include
+
+  * periods.between.words
+  * underscores\_between_words
+  * camelCaseToSeparateWords
+
+What you use is up to you, but **be consistent**.
+
+It is also possible to use the `=` operator for assignment:
+
+```{r}
+x = 1/40
+```
+
+But this is much less common among R users.  The most important thing is to
+**be consistent** with the operator you use. There are occasionally places
+where it is less confusing to use `<-` than `=`, and it is the most common
+symbol used in the community. So the recommendation is to use `<-`.
+
+> #### CHALLENGE 1
+>  
+>  What will be the value of each  variable  after each
+>  statement in the following program?
+> 
+>  ```{r, eval=FALSE}
+>  mass <- 50  
+> 
+>  age <- 22  
+>
+>  mass <- mass * 2  
+>
+>  age <- age - 20  
+>  ```
+
+## Vectorization
+
+An important thing to be aware of is that R is *vectorized*, meaning that
+variables and functions can have vectors as values. In R, a vector is a set of values of
+the same data type, that are placed in a specific order. Functions can be performed on
+every value in the vector.
+
+```{r}
+1:5 # colon notation indicates successive numbers
+2^(1:5) # operations can be performed on every value in the vector
+x <- 1:5
+2^x
+c(1,3,5,7) #vectors can be defined specifically using c()
+```
+
+In R a function can be called on every component of a list without a 'for loop'
+
+
+## Managing your environment
+
+There are a few useful commands you can use to interact with the R session.
+
+`ls` will list all of the variables and functions stored in the global environment
+(your working R session):
+
+```{r}
+ls()
+```
+
+Note here that we didn't give any arguments to `ls`, but we still
+needed to give the parentheses to tell R to call the function.
+
+You can use `rm` to delete objects you no longer need:
+
+```{r}
+rm(x)
+```
+
+## R Packages
+
+It is possible to add functions to R by writing a package, or by
+obtaining a package written by someone else. As of this writing, there
+are over 10,000 packages available on CRAN (the comprehensive R archive
+network). R and RStudio have functionality for managing packages:
+
+* You can install packages by typing `install.packages("packagename")`,
+  where `packagename` is the package name, in quotes.
+* You can make a package available for use with `library(packagename)`
+
+We will be using knitr, ggplot and gridExtra in this class, lets install them all now:
+```{r warning=FALSE}
+#install.packages("knitr")
+#install.packages("ggplot2")
+#install.packages("gridExtra")
+library(knitr)
+library(ggplot2)
+library(gridExtra)
+```
+  
+## DATA STRUCTURES
+### Introduction to the Gapminder Data Set
+
+For R section of this GPS class, we will be working with the Gapminder data set. This data  set contains population size, life expectancy and GDP per capita for many countries over time. This data set will allow us to explore data handling and manipulation techniques in R.
+
+### Download the Gapminder Data set
+
+Download the gapminder data from https://raw.githubusercontent.com/resbaz/r-novice-gapminder-files/master/data/gapminder-FiveYearData.csv
+
+1. Download the file (CTRL + S, right mouse click -> "Save as", or File -> "Save page as")  
+2. Save it as `gapminder.csv`  
+3. Create a folder on your desktop called `data/` and save the file in this new folder   
+### Set the working directory
+An impportant first step for preparing to load data into is setting the working directory, in this step, we are telling R where to look for the files we will ask for. there are a few ways of doing this:
+1. in the upper toolbar of rstudio, click 'session' > 'set working directory' > 'choose directoy' then navigate to the approtiate folder and click open.
+2. use the `setwd() fucntion and type in the path to the directory you wish to select.
+
+You can check your working directory with `getwd()`
+
+### Read the data into R studio
+ One of R's most powerful features is its ability to deal with tabular data -
+ such as you may already have in a spreadsheet or a CSV file. The `read.table` function is used for reading in tabular data stored in a text file where the columns of data are separated by punctuation characters such as CSV files (csv = comma-separated values). Tabs and commas are the most common punctuation characters used to separate or delimit data points in csv files.
+ For convenience R provides 2 other versions of `read.table`. These are: `read.csv`
+ for files where the data are separated with commas and `read.delim` for files
+ where the data are separated with tabs. Let's start by loading the gapminder data set:
+
+ ```{r}
+ gapminder <- read.csv(file = "gapminder.csv")  
+ head(gapminder)
+ ```
+ Here the first 166 lines are shown, and 1538 additional lines are not shown. To view the entire dataset in tabular form use View().
+ ```
+ View(gapminder) #note uppercase 'V'
+ ```
+The tabular view makes it a little easier to see that this data set is organized in "wide" format, meaning that each row contains a data point, and each column contains various information pertaining to that sample.
+
+### Introduction to Data Types and Structures
+ We can begin exploring our dataset right away, lets look first at the structure of our data set:
+```{r}
+str(gapminder)
+```
+This output gives us a lot of useful information:
+First, the "gapminder" data set is a Data Frame, which is on of the data structures that R can handle.
+Next, there appear to be 1704 rows (observations) and 6 columns (each containing a variable)
+Each variable is then listed after the `$` sign, following the variable name we get some information about each column.
+ - Data type
+ - Some idea of what the values are
+
+In R there are 5 main data types:
+
+ - integer: contains integers (i.e. whole numbers as you would expect)  
+ - numeric: floating point numbers (also called 'double')  
+ - complex: numeric including imaginary numbers (i)   
+ - logical: `TRUE` or `FALSE`  
+ - character: letter(s), numbers(s), word(s)  
+To determine which data type a value or vector is, use class()  
+```{r}
+x<-(2)
+class(x)
+```
+
+#### Converting Data Types
+ 
+  The definition of data types listed above seem straight forward, but confusion (and error messages) can arise when unintended data types are assigned.
+  the value `2` could be stored as an integer, numeric, complex, or a character.
+  To convert a value to an integer:
+ ```
+  as.integer(value)
+  ```
+  To convert a value to numeric:
+  ```
+  as.numeric(value)
+  ```
+  To convert a value to a character:
+  ```
+  as.character(value)
+  ```
+  There is an order of 'strictness' by definition: any entry can be a 'character' but only specific values can be integers.
+```{r}
+  as.integer("test")
+```
+
+> #### Challenge 2
+>  Create a vector called `Numbers` consisting of every number between 10 and 20  
+>
+>  What data type is it?  
+> 
+>  Create a vector called `Name` with 2 elements: your first name and your last name  
+>
+>  What data type is it?  
+  
+#### Factors
+Additionally, data types can be **factored**, which groups the values within a variable into a finite number of *factors*. For example, think about a variable full of integers, this could contain data such as test scores (i.e. values range 0-100) or group the observations (i.e.students) in to belonging to 'classroom 1' or 'classroom 2.'
+
+ ## Tip: Factors
+
+ A variety of unexpected things (mostly error messages and goofy plots) can occur when variables are not treated as factors when they should be (or vice versa).
+ To convert a variable to a factor:
+ ```
+ as.factor(variable-name)
+ ```
+ To convert a factored variable to character:
+ ```
+ as.character(factored-variable-name)
+ ```
+ To convert a factored variable to a number
+ ```
+ as.numeric(factored-variable-name)
+ ``` 
+### Vectors
+
+Vectors in R can take on any *one* of the above data types (one variable-- one data type). A data frame (like gapminder) is a collection of variables (in a certain order), each variable can hold a different data type.
+
+### Other Data Structures
+
+The simplest data structure in R is a **list**, which is essentially a vector, or collection of values in a specific order. Every value in a list must be of the same type (i.e. all integers, or all characters, not a combination)
+
+A **Data Frame** is a collection of lists, these lists are in a certain order and are useful for storing tabular data. Think of each list as a column in a spreadsheet, because each one is ordered, each row can contain different information about each data point. Although each column/list must contain a single data type, differnet columns can contain different data types (e.g. Column 1: integers, Column 2: characters, Column 3: logical...).
+
+Data in R can also be stored as a **matrix**, which is similar to a data frame, except that all variables must be of the same data type (i.e. every value is an integer, or numeric or which ever), and not a combination of data types. Additionally R can define an **array** which is similar to a matrix in that all values must be of the same type, but allows higher dimensions (matrices are limited to 2 dimensions).
+
+### Data set descriptions
+
+So if we look here at the output from `str(gapminder)` it looks like 5 continents are represented. Which continents are listed here? To pull the values from one column (i.e. the continent column) we will use `$` operator
+```{r eval=FALSE}
+gapminder$continent
+```
+This displays many of the entries, then gets cut-off. We can see that each of these values get repeated numerous times in the data set so they appear in this printout several times. To view the unique instances for this factored variable use  `unique()`
+
+```{r}
+unique(gapminder$continent)
+```
+Another very useful function for examining data sets is `length()`
+
+```{r}
+length(gapminder$continent)
+```
+The `summary()` function is useful for displaying several descriptive statistics.   
+Note: The output contains several different pieces of information, sometimes this is useful for a quick glance, sometimes this is troublesome if you want to use this output as input for another function.
+```{r}
+summary(gapminder$lifeExp)
+```
+## SUBSETTING DATA 
+Often we are interested in working with only a part of our data set. R has a few different
+techniques for subseting data, we will look at a few of these methods here:
+
+1. If you are specifically interested in the first part, or the last part of an object, `head()` and `tail()` can be useful.
+```{r}
+head(gapminder)
+tail(gapminder)
+```
+By defualt they return the first 6, or last 6 elements of the object, but they can take another argument to specify the numbery of elements to display:
+```{r}
+head(gapminder, 2)
+tail(gapminder, 10)
+```
+
+2. Use brackets (`[]`) to select rows and columns based on row and column number:
+The first value is the row number, and the second is the column number
+```{r}
+gapminder[1,1]
+```
+Note,the values for row and column numbers can be vectors
+```{r}
+gapminder[1:5,c(1,3,5)]
+```
+If either value is not specified, all rows/columns will be returned
+```{r}
+gapminder[1,]
+```
+3. The names of rows and columns can be specifically called for subsetting as well
+```{r}
+ gapminder[gapminder$country=="Australia" & gapminder$year==1952, c("year","lifeExp")]
+```
+4. Subsetting can also be achieved with the `subset()` function, which takes 3 arguments:
+ data frame, row selection and column selection
+```{r}
+subset(gapminder, country=="Australia" & year==1952, select = c(year,lifeExp))
+```
+5. Functions in the 'dplyr' library: will be covered later 
+
+> #### Challenge 3
+> Use your new 'subsetting' skills to display the life expectancy and GDPperCapita for
+> people in Paraguay in 2007
+
+## DATA DEPENDENT CHOICES (IF STATEMENTS)
+Often when we're coding we want to control the flow of our actions. This can be done
+by setting actions to occur only if a condition or a set of conditions are met.
+
+The first exmaple follows this form:
+
+if (condition is true) {
+  perform action
+} else {  # that is, if the condition is false,
+  perform alternative action
+}
+
+A more concrete example is here:
+```{r}
+x <- 8
+
+if (x >= 10) {
+  print("x is greater than or equal to 10")
+} else {
+  print("x is less than 10")
+}
+```
+
+You can also test multiple conditions by using `else if`.
+
+```{r}
+x <- 8
+
+if (x >= 10) {
+  print("x is greater than or equal to 10")
+} else if (x > 5) {
+  print("x is greater than 5, but less than 10")
+} else {
+  print("x is less than 5")
+}
+```
+
+**Important:** when R evaluates the condition inside `if()` statements, it is
+looking for a logical element, i.e., `TRUE` or `FALSE`.
+
+```{r}
+x  <-  4 == 3
+if (x) {
+  "4 equals 3"
+} else {
+  "4 does not equal 3"
+}
+```
+
+As we can see, the not equal message was printed because the vector x is `FALSE`
+
+```{r}
+x <- 4 == 3
+x
+```
+
+## KNITR
+In the next section, we will use knitr to create
+reports that allow integration of code, output and plots.
+
+Data analysts tend to write a lot of reports, describing their
+analyses and results, for their collaborators or to document their
+work for future reference.
+
+A web page (as an html file) can be an easy way to format reports. It can be one long stream, so tall figures can be used that wouldn't ordinary fit on one page. Scrolling is your friend.
+
+The gold standard of data management in many laboratories is to print a file, hole-punch
+and put it in a 3-ring binder on the shelf. Though not practical for many data sets this
+procedure is durable!
+
+**We will use knitr to create reports that conveniently combine code, output (including plots),
+and notes in one document.**
+
+### Literate programming
+
+Ideally, such analysis reports are _reproducible_ documents: If an
+error is discovered, or if some additional subjects are added to the
+data, you can just re-compile the report and get the new or corrected
+results (versus having to reconstruct figures, paste them into
+a Word document, and further hand-edit various detailed results).
+
+The key tool for R is [knitr](http://yihui.name/knitr/), which allows
+you to create a document that is a mixture of text and some chunks of
+code. When the document is processed by knitr, chunks of R code will
+be executed, and graphs or other results inserted.
+
+knitr allows you to mix basically any sort of text with any sort of
+code, but we recommend that you use R Markdown, which mixes Markdown
+with R. Markdown is a light-weight mark-up language for creating web
+pages. Think of markdown as a way to convert the ubiquitous nature of text files with more human readable formating, such as headings, bold, and italics. Markdown side-steps the hassle formatting differences among operating systems or closed source programs. The file that we 'mark up' will be converted into an HTML file that we can save and read later.
+
+### Creating a R Markdown file
+
+Within R Studio, click File &rarr; New File &rarr; R Markdown 
+
+You can stick with the default (HTML output), but lets give it a useful title:
+2019-GPS_IntroToR
+Select `ok`
+
+R Studio creates a document with some heading information that we just entered and
+also some example text. Later we will delete the example code and add our own, but for
+now lets go through their example.
+
+### Basic components of R Markdown
+
+To get an idea of what R Markdown does, lets compare the markdown file with the html output.
+To create the html output, click the `Knit` button at the top of the new R markdown file window.
+
+At the top, we can see the information that we added during setup. The formatting here isn't
+very obvious, but for the rest of the document there will be a clear pattern.
+
+```
+---
+title: "Initial R Markdown document"
+author: "Karl Broman"
+date: "April 23, 2015"
+output: html_document
+---
+```
+
+The next bit on the R Markdown file passes some set-up information about how to use R when
+running the programs to generate the output and create plots. For now, lets leave that
+the way it is.
+
+From here, we can see a more close mapping of information that is in the R markdown file to
+what is in the html file.
+
+The first line 'R Markdown' appears large on the html, this is specified by the hash marks
+at the beginning of the line.
+You can make section headers of different sizes by initiating a line
+with some number of `#` symbols:
+
+```
+# Title
+## Main section
+### Sub-section
+#### Sub-sub section
+```
+Next, we have a block of normal-looking text, no additional marks are required for this
+feature. However, portions of this text can be modified to include:
+ - A hyperlink: enclose the url in angle brackets `<example.com>`
+ - Bold: use two pairs of asterisks `**bold**`
+ - Italics: use underscores, like this: `_italics_`.
+ - Bulleted lists can be made by ` - starting the line with a hyphen`e
+ - Additionally code-type font can be made with back ticks
+
+
+
+> #### Challenge 4
+>
+> Create a new R Markdown document. Delete all of the R code chunks
+> and write a bit of Markdown (some sections, some italicized
+> text, and an itemized list).
+>
+
+
+
+### A bit more Markdown
+
+You can include an image file like this: `![caption](http://url/for/file)`
+
+You can do subscripts (e.g., H~2~O as in water) with `H~2~O` and superscripts (e.g.,
+2^3^ = 8) with `2^3^`.
+
+### R code chunks
+
+Markdown is interesting and useful, but the real power comes from
+mixing markdown with chunks of R code. This is R Markdown. When
+processed, the R code will be executed; if they produce figures, the
+figures will be inserted in the final document.
+
+The main code chunks look like this:
+
+<pre>
+&#96;&#96;&#96;{r load_data}
+gapminder <- read.csv("~/Desktop/gapminder.csv")
+&#96;&#96;&#96;
+</pre>
+
+That is, you place a chunk of R code between <code>&#96;&#96;&#96;{r chunk_name}</code>
+and <code>&#96;&#96;&#96;</code>. It's a good idea to give each chunk
+a name, as they will help you to fix errors and, if any graphs are
+produced, the file names are based on the name of the code chunk that
+produced them.
+
+> ## Challenge 4-1
+> Add code chunks to you knitr document to:    
+>
+> - Load the ggplot2 package  
+>
+> - Read the gapminder data  
+>
+> - Look at some part of the gapminder dataset, maybe calculate a mean  
+
+### How things get compiled
+
+When you press the "Knit HTML" button, the R Markdown document is
+processed by [knitr](http://yihui.name/knitr) and a plain Markdown
+document is produced (as well as, potentially, a set of figure files): the R code is
+executed
+and replaced by both the input and the output; if figures are
+produced, links to those figures are included.
+
+The Markdown and figure documents are then processed by the tool
+[pandoc](http://pandoc.org/), which converts the Markdown file into an
+html file, with the figures embedded.
+
+```{r rmd_to_html_fig, fig.width=8, fig.height=3, fig.align="left", echo=FALSE}
+par(mar=rep(0, 4), bty="n", cex=1.5)
+plot(0, 0, type="n", xlab="", ylab="", xaxt="n", yaxt="n",
+     xlim=c(0, 100), ylim=c(0, 100))
+xw <- 10
+yh <- 35
+xm <- 12
+ym <- 50
+rect(xm-xw/2, ym-yh/2, xm+xw/2, ym+yh/2, lwd=2)
+text(xm, ym, ".Rmd")
+
+xm <- 50
+ym <- 80
+rect(xm-xw/2, ym-yh/2, xm+xw/2, ym+yh/2, lwd=2)
+text(xm, ym, ".md")
+xm <- 50; ym <- 25
+for(i in c(2, 0, -2))
+    rect(xm-xw/2+i, ym-yh/2+i, xm+xw/2+i, ym+yh/2+i, lwd=2,
+         border="black", col="white")
+text(xm-2, ym-2, "figs/")
+
+xm <- 100-12
+ym <- 50
+rect(xm-xw/2, ym-yh/2, xm+xw/2, ym+yh/2, lwd=2)
+text(xm, ym, ".html")
+
+arrows(22, 50, 38, 50, lwd=2, col="slateblue", len=0.1)
+text((22+38)/2, 60, "knitr", col="darkslateblue", cex=1.3)
+
+arrows(62, 50, 78, 50, lwd=2, col="slateblue", len=0.1)
+text((62+78)/2, 60, "pandoc", col="darkslateblue", cex=1.3)
+```
+
+### Chunk options
+
+There are a variety of options to affect how the code chunks are
+treated.
+
+- Use `echo=FALSE` to avoid having the code itself shown.
+- Use `results="hide"` to avoid having any results printed.
+- Use `eval=FALSE` to have the code shown but not evaluated.
+- Use `warning=FALSE` and `message=FALSE` to hide any warnings or
+  messages produced.
+- Use `fig.height` and `fig.width` to control the size of the figures
+  produced (in inches).
+
+So you might write:
+
+<pre>
+&#96;&#96;&#96;{r load_libraries, echo=FALSE, message=FALSE}
+library("dplyr")
+library("ggplot2")
+&#96;&#96;&#96;
+</pre>
+
+Often there will be particular options that you'll want to use
+repeatedly; for this, you can set _global_ chunk options, like so:
+
+<pre>
+&#96;&#96;&#96;{r global_options, echo=FALSE}
+knitr::opts_chunk$set(fig.path="Figs/", message=FALSE, warning=FALSE,
+                      echo=FALSE, results="hide", fig.width=11)
+&#96;&#96;&#96;
+</pre>
+
+The `fig.path` option defines where the figures will be saved. The `/`
+here is really important; without it, the figures would be saved in
+the standard place but just with names that begin with `Figs`.
+
+If you have multiple R Markdown files in a common directory, you might
+want to use `fig.path` to define separate prefixes for the figure file
+names, like `fig.path="Figs/cleaning-"` and `fig.path="Figs/analysis-"`.
+
+### Inline R code
+
+You can make _every_ number in your report reproducible. Use
+<code>&#96;r</code> and <code>&#96;</code> for an in-line code chunk,
+like so: <code>&#96;r round(some_value, 2)&#96;</code>. The code will be
+executed and replaced with the _value_ of the result.
+
+Don't let these in-line chunks get split across lines.
+
+Perhaps precede the paragraph with a larger code chunk that does
+calculations and defines things, with `include=FALSE` for that larger
+chunk (which is the same as `echo=FALSE` and `results="hide"`).
+
+### Other output options
+
+You can also convert R Markdown to a PDF or a Word document. Click the
+little triangle next to the "Knit HTML" button to get a drop-down
+menu. Or you could put `pdf_document` or `word_document` in the header
+of the file.
+
+> ## Tip: Creating PDF documents
+>
+> Creating .pdf documents may require installation of some extra software. If
+> required this is detailed in an error message.
+>
+> - [TeX installers for Windows](https://miktex.org/2.9/setup).
+> - [TeX installers for macOS](https://tug.org/mactex).
+
+
+
+> ## Challenge
+>
+> Let's use knitr to make a file describing what we've done so far:
+>
+>  - Load data
+>
+>  - Add a library [ggplot]
+> 
+>  - Examine the data structure [str()]
+
+
+
+
+
+### Resources
+
+- [Knitr in a knutshell tutorial](http://kbroman.org/knitr_knutshell)
+- [Dynamic Documents with R and knitr](http://www.amazon.com/exec/obidos/ASIN/1482203537/7210-20) (book)
+- [R Markdown documentation](http://rmarkdown.rstudio.com)
+- [R Markdown cheat sheet](http://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+* [Getting started with R Markdown](https://www.rstudio.com/resources/webinars/getting-started-with-r-markdown/)
+* [Reproducible Reporting](https://www.rstudio.com/resources/webinars/reproducible-reporting/)
+* [The Ecosystem of R Markdown](https://www.rstudio.com/resources/webinars/the-ecosystem-of-r-markdown/)
+* [Introducing Bookdown](https://www.rstudio.com/resources/webinars/introducing-bookdown/)
+
+
+
+
+
+
+
+
+
+
